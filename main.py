@@ -143,10 +143,17 @@ if __name__ == "__main__":
         [Input("network", "clickData"), Input("network", "relayoutData")],
     )
     def update_table(clickData, relayoutData):
-        print(clickData)
-        print("------")
-        print(relayoutData)
-        if clickData:
+        if relayoutData:
+            if "autosize" in relayoutData:
+                return nodes.to_dict(orient="records")
+            elif "xaxis.range[0]" in relayoutData:
+                visible = get_visible_names(pos, relayoutData)
+                return nodes[nodes["Name"].isin(visible)].to_dict(
+                    orient="records"
+                )
+            else:
+                return nodes.to_dict(orient="records")
+        elif clickData:
             points = clickData["points"]
             user_names = [p["customdata"] for p in points]
             return nodes[nodes["Name"].isin(user_names)].to_dict(
