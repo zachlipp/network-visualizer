@@ -152,7 +152,7 @@ if __name__ == "__main__":
     )
     def update_table(clickData, relayoutData):
         if relayoutData:
-            if "autosize" in relayoutData:
+            if "autosize" in relayoutData or "xaxis.autorange" in relayoutData:
                 return nodes.to_dict(orient="records")
             elif "xaxis.range[0]" in relayoutData:
                 visible = get_visible_names(pos, relayoutData)
