@@ -91,8 +91,12 @@ if __name__ == "__main__":
     external_stylesheets = ["https://codepen.io/chriddyp/pen/bWLwgP.css"]
     app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
-    nodes = pd.read_csv("quakers_nodelist.csv")
-    edges = pd.read_csv("quakers_edgelist.csv")
+    nodes = pd.read_csv(
+        "https://programminghistorian.org/assets/exploring-and-analyzing-network-data-with-python/quakers_nodelist.csv"
+    )
+    edges = pd.read_csv(
+        "https://programminghistorian.org/assets/exploring-and-analyzing-network-data-with-python/quakers_edgelist.csv"
+    )
 
     G = nx.from_pandas_edgelist(edges, "Source", "Target")
     pos = nx.spring_layout(G)
@@ -112,12 +116,13 @@ if __name__ == "__main__":
     node_trace = graph_nodes(
         *unpack_nodes(G),
         node_colors=node_colors,
-        node_text=node_text,
+        node_text=nodes.Name,
         ids=nodes.Name,
     )
 
     app.layout = html.Div(
         [
+            html.H1("My Network App"),
             dcc.Graph(
                 id="network",
                 figure=go.Figure(
