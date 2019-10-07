@@ -69,14 +69,22 @@ def graph_nodes(
 
 def get_visible_names(positions: Dict, visible: Dict) -> List:
     # Index based on nodes, names in this case
-    coord = pd.DataFrame(positions).T
+    coords = pd.DataFrame(positions).T
 
-    x_min, x_max, y_min, y_max = visible.values()
+    x_min = visible.get("xaxis.range[0]")
+    x_max = visible.get("xaxis.range[1]")
+    y_min = visible.get("yaxis.range[0]")
+    y_max = visible.get("yaxis.range[1]")
 
-    new_coord = coord[
-        coord[0].between(x_min, x_max) & coord[1].between(y_min, y_max)
-    ]
-    return new_coord.index.tolist()
+    if all([x_min, y_min]):
+        new_coords = coords[
+            coords[0].between(x_min, x_max) & coords[1].between(y_min, y_max)
+        ]
+    elif x_min:
+        new_coords = coords[coords[0].between(x_min, x_max)]
+    elif y_min:
+        new_coords = coords[coords[1].between(y_min, y_max)]
+    return new_coords.index.tolist()
 
 
 if __name__ == "__main__":
