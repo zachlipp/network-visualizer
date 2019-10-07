@@ -154,19 +154,19 @@ if __name__ == "__main__":
         if relayoutData:
             if "autosize" in relayoutData or "xaxis.autorange" in relayoutData:
                 return nodes.to_dict(orient="records")
-            elif "xaxis.range[0]" in relayoutData:
+            else:
                 visible = get_visible_names(pos, relayoutData)
                 return nodes[nodes["Name"].isin(visible)].to_dict(
                     orient="records"
                 )
-            else:
-                return nodes.to_dict(orient="records")
-        elif clickData:
-            points = clickData["points"]
-            user_names = [p["customdata"] for p in points]
-            return nodes[nodes["Name"].isin(user_names)].to_dict(
-                orient="records"
-            )
+        if clickData:
+            if clickData != past_click:
+                points = clickData["points"]
+                user_names = [p["customdata"] for p in points]
+                past_click = clickData
+                return nodes[nodes["Name"].isin(user_names)].to_dict(
+                    orient="records"
+                )
         else:
             return nodes.to_dict(orient="records")
 
