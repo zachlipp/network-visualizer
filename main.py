@@ -147,24 +147,17 @@ if __name__ == "__main__":
     )
 
     @app.callback(
-        Output("description", "data"),
-        [Input("network", "clickData"), Input("network", "relayoutData")],
+        Output("description", "data"), [Input("network", "relayoutData")]
     )
-    def update_table(clickData, relayoutData):
+    def update_table(relayoutData):
         if relayoutData:
             if "autosize" in relayoutData or "xaxis.autorange" in relayoutData:
                 return nodes.to_dict(orient="records")
             else:
                 visible = get_visible_names(pos, relayoutData)
+                print(visible)
+                print(nodes[nodes["Name"].isin(visible)])
                 return nodes[nodes["Name"].isin(visible)].to_dict(
-                    orient="records"
-                )
-        if clickData:
-            if clickData != past_click:
-                points = clickData["points"]
-                user_names = [p["customdata"] for p in points]
-                past_click = clickData
-                return nodes[nodes["Name"].isin(user_names)].to_dict(
                     orient="records"
                 )
         else:
