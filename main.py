@@ -87,6 +87,15 @@ def get_visible_names(positions: Dict, visible: Dict) -> List:
     return new_coords.index.tolist()
 
 
+def sort_nodes_by_graph(
+    nodes: pd.core.frame.DataFrame, G: Graph
+) -> pd.core.frame.DataFrame:
+    nodes["graph_order"] = nodes["Name"].astype("category")
+    graph_node_order = list(G.nodes())
+    nodes.graph_order.cat.set_categories(graph_node_order, inplace=True)
+    return nodes.sort_values("graph_order")
+
+
 if __name__ == "__main__":
     external_stylesheets = ["https://codepen.io/chriddyp/pen/bWLwgP.css"]
     app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
@@ -101,6 +110,7 @@ if __name__ == "__main__":
     G = nx.from_pandas_edgelist(edges, "Source", "Target")
     pos = nx.spring_layout(G)
     nx.set_node_attributes(G, name="pos", values=pos)
+    nodes = sort_nodes_by_graph(nodes, G)
 
     node_adjacencies = []
     for adjacencies in G.adjacency():
