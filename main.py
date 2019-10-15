@@ -12,6 +12,9 @@ from dash.dependencies import Input, Output
 from networkx.classes.graph import Graph
 from plotly.graph_objs import Scatter
 
+with open("lipsum.txt", "r") as infile:
+    helper_text = infile.read()
+
 
 def unpack_edges(G: Graph) -> Tuple[List[float]]:
     edge_x = []
@@ -97,7 +100,13 @@ def sort_nodes_by_graph(
 
 
 if __name__ == "__main__":
-    external_stylesheets = ["https://codepen.io/chriddyp/pen/bWLwgP.css"]
+    external_stylesheets = [
+        "http://berniesandersofficial.com/wp-includes/css/dist/block-library/style.min.css?ver=5.2.3",
+        "http://berniesandersofficial.com/wp-content/plugins/cpo-companion/assets/css/fontawesome.css?ver=5.2.3",
+        "http://berniesandersofficial.com/wp-content/plugins/kiwi-social-share/assets/vendors/icomoon/style.css?ver=2.0.15",
+        "http://berniesandersofficial.com/wp-content/themes/allegiant/core/css/base.css?ver=5.2.3",
+        "http://berniesandersofficial.com/wp-content/themes/allegiant/style.css?ver=5.2.3",
+    ]
     app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
     nodes = pd.read_csv(
@@ -132,31 +141,51 @@ if __name__ == "__main__":
 
     app.layout = html.Div(
         [
-            html.H1("My Network App"),
-            dcc.Graph(
-                id="network",
-                figure=go.Figure(
-                    data=[edge_trace, node_trace],
-                    layout=go.Layout(
-                        hovermode="closest",
-                        margin=dict(b=20, l=5, r=5, t=40),
-                        xaxis=dict(
-                            showgrid=False,
-                            zeroline=False,
-                            showticklabels=False,
+            html.H1("Network Visualizer", className="header"),
+            html.Div(
+                [
+                    dcc.Graph(
+                        id="network",
+                        figure=go.Figure(
+                            data=[edge_trace, node_trace],
+                            layout=go.Layout(
+                                hovermode="closest",
+                                margin=dict(b=20, l=5, r=5, t=40),
+                                xaxis=dict(
+                                    showgrid=False,
+                                    zeroline=False,
+                                    showticklabels=False,
+                                ),
+                                yaxis=dict(
+                                    showgrid=False,
+                                    zeroline=False,
+                                    showticklabels=False,
+                                ),
+                            ),
                         ),
-                        yaxis=dict(
-                            showgrid=False,
-                            zeroline=False,
-                            showticklabels=False,
-                        ),
-                    ),
-                ),
+                    )
+                ],
+                className="graph-container",
             ),
-            dash_table.DataTable(
-                id="description",
-                columns=[{"id": c, "name": c} for c in nodes.columns],
-                data=nodes.to_dict(orient="records"),
+            html.Div([html.P(helper_text)], className="text"),
+            html.Div(
+                [
+                    dash_table.DataTable(
+                        id="description",
+                        columns=[
+                            {"id": c, "name": c}
+                            for c in [
+                                "Name",
+                                "Historical Significance",
+                                "Gender",
+                            ]
+                        ],
+                        data=nodes[
+                            ["Name", "Historical Significance", "Gender"]
+                        ].to_dict(orient="records"),
+                    )
+                ],
+                className="pandas",
             ),
         ]
     )
@@ -165,17 +194,16 @@ if __name__ == "__main__":
         Output("description", "data"), [Input("network", "relayoutData")]
     )
     def update_table(relayoutData):
+        display = ["Name", "Historical Significance", "Gender"]
         if relayoutData:
             if "autosize" in relayoutData or "xaxis.autorange" in relayoutData:
-                return nodes.to_dict(orient="records")
+                return nodes[display].to_dict(orient="records")
             else:
                 visible = get_visible_names(pos, relayoutData)
-                print(visible)
-                print(nodes[nodes["Name"].isin(visible)])
-                return nodes[nodes["Name"].isin(visible)].to_dict(
+                return nodes[nodes["Name"].isin(visible)][display].to_dict(
                     orient="records"
                 )
         else:
-            return nodes.to_dict(orient="records")
+            return nodes[display].to_dict(orient="records")
 
     app.run_server(host="0.0.0.0", debug=True)
