@@ -141,7 +141,7 @@ if __name__ == "__main__":
 
     app.layout = html.Div(
         [
-            html.H1("Network Visualizer"),
+            html.H1("Network Visualizer", className="header"),
             html.Div(
                 [
                     dcc.Graph(
@@ -165,25 +165,27 @@ if __name__ == "__main__":
                         ),
                     )
                 ],
-                style={
-                    "display": "inline-block",
-                    "width": "40%",
-                    "padding-right": "2in",
-                },
+                className="graph-container",
             ),
+            html.Div([html.P(helper_text)], className="text"),
             html.Div(
-                [html.P(helper_text)],
-                style={"display": "inline-block", "width": "45%"},
-            ),
-            dash_table.DataTable(
-                id="description",
-                columns=[
-                    {"id": c, "name": c}
-                    for c in ["Name", "Historical Significance", "Gender"]
+                [
+                    dash_table.DataTable(
+                        id="description",
+                        columns=[
+                            {"id": c, "name": c}
+                            for c in [
+                                "Name",
+                                "Historical Significance",
+                                "Gender",
+                            ]
+                        ],
+                        data=nodes[
+                            ["Name", "Historical Significance", "Gender"]
+                        ].to_dict(orient="records"),
+                    )
                 ],
-                data=nodes[
-                    ["Name", "Historical Significance", "Gender"]
-                ].to_dict(orient="records"),
+                className="pandas",
             ),
         ]
     )

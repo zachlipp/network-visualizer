@@ -1,0 +1,26 @@
+.header {
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+.graph-container {
+  margin-left: 20px;
+  margin-right: 20px;
+  display: inline-block;
+  width: 45%;
+}
+
+.text {
+  margin-left: 20px;
+  margin-right: 20px;
+  width: 45%;
+  height: 400px;
+  display: inline-block;
+}
+
+.pandas {
+  width: 1000px;
+  height: 500px;
+  margin: auto;
+  overflow: scroll;
+}
