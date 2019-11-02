@@ -31,3 +31,14 @@ def unpack_edges(network: Graph) -> Tuple[List[float]]:
     # Transpose the list to get ndim lists of len(network.edges())
     transposed = pd.DataFrame(positions).T.values
     return transposed
+
+
+def unpack_nodes(network: Graph) -> Tuple[List[float]]:
+    positions = []
+    for node in network.nodes():
+        position = network.node[node]["position"]
+        positions.append(position)
+
+    # Transpose the list to get ndim lists of len(network.edges())
+    transposed = pd.DataFrame(positions).T.values
+    return transposed

@@ -13,20 +13,10 @@ from networkx.classes.graph import Graph
 from plotly.graph_objs import Scatter
 
 from datasets import load_data
-from viz import unpack_edges
+from viz import unpack_edges, unpack_nodes
 
 with open("lipsum.txt", "r") as infile:
     helper_text = infile.read()
-
-
-def unpack_nodes(G: Graph) -> Tuple[List[float]]:
-    node_x = []
-    node_y = []
-    for node in G.nodes():
-        x, y = G.node[node]["position"]
-        node_x.append(x)
-        node_y.append(y)
-    return node_x, node_y
 
 
 def graph_edges(x: List, y: List) -> Scatter:
