@@ -12,6 +12,8 @@ from dash.dependencies import Input, Output
 from networkx.classes.graph import Graph
 from plotly.graph_objs import Scatter
 
+from datasets import load_data
+
 with open("lipsum.txt", "r") as infile:
     helper_text = infile.read()
 
@@ -20,8 +22,8 @@ def unpack_edges(G: Graph) -> Tuple[List[float]]:
     edge_x = []
     edge_y = []
     for edge in G.edges():
-        x0, y0 = G.node[edge[0]]["pos"]
-        x1, y1 = G.node[edge[1]]["pos"]
+        x0, y0 = G.node[edge[0]]["position"]
+        x1, y1 = G.node[edge[1]]["position"]
         edge_x.append(x0)
         edge_x.append(x1)
         edge_x.append(None)
@@ -35,7 +37,7 @@ def unpack_nodes(G: Graph) -> Tuple[List[float]]:
     node_x = []
     node_y = []
     for node in G.nodes():
-        x, y = G.node[node]["pos"]
+        x, y = G.node[node]["position"]
         node_x.append(x)
         node_y.append(y)
     return node_x, node_y
@@ -90,14 +92,6 @@ def get_visible_names(positions: Dict, visible: Dict) -> List:
     return new_coords.index.tolist()
 
 
-def sort_nodes_by_graph(
-    nodes: pd.core.frame.DataFrame, G: Graph
-) -> pd.core.frame.DataFrame:
-    nodes["graph_order"] = nodes["Name"].astype("category")
-    graph_node_order = list(G.nodes())
-    nodes.graph_order.cat.set_categories(graph_node_order, inplace=True)
-    return nodes.sort_values("graph_order")
-
 
 if __name__ == "__main__":
     external_stylesheets = [
@@ -107,22 +101,11 @@ if __name__ == "__main__":
         "http://berniesandersofficial.com/wp-content/themes/allegiant/core/css/base.css?ver=5.2.3",
         "http://berniesandersofficial.com/wp-content/themes/allegiant/style.css?ver=5.2.3",
     ]
+    nodes, edges, network = load_data(id_field="Name")
     app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
-    nodes = pd.read_csv(
-        "https://programminghistorian.org/assets/exploring-and-analyzing-network-data-with-python/quakers_nodelist.csv"
-    )
-    edges = pd.read_csv(
-        "https://programminghistorian.org/assets/exploring-and-analyzing-network-data-with-python/quakers_edgelist.csv"
-    )
-
-    G = nx.from_pandas_edgelist(edges, "Source", "Target")
-    pos = nx.spring_layout(G)
-    nx.set_node_attributes(G, name="pos", values=pos)
-    nodes = sort_nodes_by_graph(nodes, G)
-
     node_adjacencies = []
-    for adjacencies in G.adjacency():
+    for adjacencies in network.adjacency():
         node_adjacencies.append(len(adjacencies[1]))
 
     node_text = [
@@ -131,9 +114,9 @@ if __name__ == "__main__":
     ]
 
     node_colors = nodes["Gender"].map({"male": "blue", "female": "red"})
-    edge_trace = graph_edges(*unpack_edges(G))
+    edge_trace = graph_edges(*unpack_edges(network))
     node_trace = graph_nodes(
-        *unpack_nodes(G),
+        *unpack_nodes(network),
         node_colors=node_colors,
         node_text=nodes.Name,
         ids=nodes.Name,
@@ -199,7 +182,9 @@ if __name__ == "__main__":
             if "autosize" in relayoutData or "xaxis.autorange" in relayoutData:
                 return nodes[display].to_dict(orient="records")
             else:
-                visible = get_visible_names(pos, relayoutData)
+                visible = get_visible_names(
+                    nx.get_node_attributes(network, "position"), relayoutData
+                )
                 return nodes[nodes["Name"].isin(visible)][display].to_dict(
                     orient="records"
                 )
