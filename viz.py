@@ -46,12 +46,11 @@ def unpack_nodes(network: Graph) -> Tuple[List[float]]:
     return transposed
 
 
-def graph_edges(x: List, y: List, z: List) -> Scatter3d:
-    # TODO: Generalize to 2 dimensions
-    edge_trace = go.Scatter3d(
+def graph_edges(x: List, y: List) -> Scatter:
+    # TODO: Generalize
+    edge_trace = go.Scatter(
         x=x,
         y=y,
-        z=z,
         line=dict(width=0.5, color="#888"),
         hoverinfo="none",
         mode="lines",
@@ -61,13 +60,12 @@ def graph_edges(x: List, y: List, z: List) -> Scatter3d:
 
 
 def graph_nodes(
-    x: List, y: List, z: List, node_colors: List, node_text: List, ids: List
+    x: List, y: List, node_colors: List, node_text: List, ids: List
 ) -> Scatter3d:
-    # TODO: Generalize to 2 dimensions
-    node_trace = go.Scatter3d(
+    # TODO: Generalize
+    node_trace = go.Scatter(
         x=x,
         y=y,
-        z=z,
         mode="markers",
         hoverinfo="text",
         showlegend=False,

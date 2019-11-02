@@ -48,7 +48,7 @@ if __name__ == "__main__":
         "http://berniesandersofficial.com/wp-content/themes/allegiant/core/css/base.css?ver=5.2.3",
         "http://berniesandersofficial.com/wp-content/themes/allegiant/style.css?ver=5.2.3",
     ]
-    nodes, edges, network = load_data(id_field="Name", graph_dimensions=3)
+    nodes, edges, network = load_data(id_field="Name", graph_dimensions=2)
     app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
     node_adjacencies = []
