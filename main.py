@@ -12,30 +12,9 @@ from dash.dependencies import Input, Output
 from networkx.classes.graph import Graph
 from plotly.graph_objs import Scatter, Scatter3d
 
-from app import app
+from app import app, get_visible_names_2d
 from datasets import helper_text, load_data
 from viz import graph_edges, graph_nodes, unpack_edges, unpack_nodes
-
-
-def get_visible_names(positions: Dict, visible: Dict) -> List:
-    # Index based on nodes, names in this case
-    coords = pd.DataFrame(positions).T
-
-    x_min = visible.get("xaxis.range[0]")
-    x_max = visible.get("xaxis.range[1]")
-    y_min = visible.get("yaxis.range[0]")
-    y_max = visible.get("yaxis.range[1]")
-
-    if all([x_min, y_min]):
-        new_coords = coords[
-            coords[0].between(x_min, x_max) & coords[1].between(y_min, y_max)
-        ]
-    elif x_min:
-        new_coords = coords[coords[0].between(x_min, x_max)]
-    elif y_min:
-        new_coords = coords[coords[1].between(y_min, y_max)]
-    return new_coords.index.tolist()
-
 
 if __name__ == "__main__":
     nodes, edges, network = load_data(id_field="Name", graph_dimensions=2)
@@ -119,7 +98,7 @@ if __name__ == "__main__":
             if "autosize" in relayoutData or "xaxis.autorange" in relayoutData:
                 return nodes[display].to_dict(orient="records")
             else:
-                visible = get_visible_names(
+                visible = get_visible_names_2d(
                     nx.get_node_attributes(network, "position"), relayoutData
                 )
                 return nodes[nodes["Name"].isin(visible)][display].to_dict(
