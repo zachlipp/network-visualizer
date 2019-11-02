@@ -26,22 +26,13 @@ from viz import (
 if __name__ == "__main__":
     nodes, edges, network = load_data(id_field="Name", graph_dimensions=2)
 
-    node_adjacencies = []
-    for adjacencies in network.adjacency():
-        node_adjacencies.append(len(adjacencies[1]))
-
-    node_text = [
-        f"Name: {x} <br># Connections: {y}"
-        for x, y in zip(nodes.Name, node_adjacencies)
-    ]
-
-    node_colors = nodes["Gender"].map({"male": "blue", "female": "red"})
+    nodes["color"] = nodes["Gender"].map({"male": "blue", "female": "red"})
     edge_trace = graph_edges(*unpack_edges(network))
     node_trace = graph_nodes(
         *unpack_nodes(network),
-        node_colors=node_colors,
-        node_text=nodes.Name,
-        ids=nodes.Name,
+        node_colors=nodes["color"],
+        node_text=nodes["Name"],
+        ids=nodes["Name"]
     )
 
     app.layout = html.Div(
