@@ -1,7 +1,9 @@
 from typing import Dict, List, Tuple
 
 import pandas as pd
+import plotly.graph_objects as go
 from networkx.classes.graph import Graph
+from plotly.graph_objs import Scatter, Scatter3d
 
 
 def unpack_edges(network: Graph) -> Tuple[List[float]]:
@@ -42,3 +44,35 @@ def unpack_nodes(network: Graph) -> Tuple[List[float]]:
     # Transpose the list to get ndim lists of len(network.edges())
     transposed = pd.DataFrame(positions).T.values
     return transposed
+
+
+def graph_edges(x: List, y: List, z: List) -> Scatter3d:
+    # TODO: Generalize to 2 dimensions
+    edge_trace = go.Scatter3d(
+        x=x,
+        y=y,
+        z=z,
+        line=dict(width=0.5, color="#888"),
+        hoverinfo="none",
+        mode="lines",
+        showlegend=False,
+    )
+    return edge_trace
+
+
+def graph_nodes(
+    x: List, y: List, z: List, node_colors: List, node_text: List, ids: List
+) -> Scatter3d:
+    # TODO: Generalize to 2 dimensions
+    node_trace = go.Scatter3d(
+        x=x,
+        y=y,
+        z=z,
+        mode="markers",
+        hoverinfo="text",
+        showlegend=False,
+        marker=dict(color=node_colors, size=10, line_width=2),
+    )
+    node_trace.customdata = ids
+    node_trace.text = node_text
+    return node_trace

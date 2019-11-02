@@ -10,42 +10,13 @@ import pandas as pd
 import plotly.graph_objects as go
 from dash.dependencies import Input, Output
 from networkx.classes.graph import Graph
-from plotly.graph_objs import Scatter
+from plotly.graph_objs import Scatter, Scatter3d
 
 from datasets import load_data
-from viz import unpack_edges, unpack_nodes
+from viz import graph_edges, graph_nodes, unpack_edges, unpack_nodes
 
 with open("lipsum.txt", "r") as infile:
     helper_text = infile.read()
-
-
-def graph_edges(x: List, y: List) -> Scatter:
-    edge_trace = go.Scatter(
-        x=x,
-        y=y,
-        line=dict(width=0.5, color="#888"),
-        hoverinfo="none",
-        mode="lines",
-        showlegend=False,
-    )
-    return edge_trace
-
-
-def graph_nodes(
-    x: List, y: List, node_colors: List, node_text: List, ids: List
-) -> Scatter:
-    node_trace = go.Scatter(
-        x=x,
-        y=y,
-        mode="markers",
-        hoverinfo="text",
-        showlegend=False,
-        marker=dict(color=node_colors, size=10, line_width=2),
-    )
-
-    node_trace.customdata = ids
-    node_trace.text = node_text
-    return node_trace
 
 
 def get_visible_names(positions: Dict, visible: Dict) -> List:
@@ -77,7 +48,7 @@ if __name__ == "__main__":
         "http://berniesandersofficial.com/wp-content/themes/allegiant/core/css/base.css?ver=5.2.3",
         "http://berniesandersofficial.com/wp-content/themes/allegiant/style.css?ver=5.2.3",
     ]
-    nodes, edges, network = load_data(id_field="Name")
+    nodes, edges, network = load_data(id_field="Name", graph_dimensions=3)
     app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
     node_adjacencies = []
@@ -153,6 +124,7 @@ if __name__ == "__main__":
         Output("description", "data"), [Input("network", "relayoutData")]
     )
     def update_table(relayoutData):
+        print(relayoutData)
         display = ["Name", "Historical Significance", "Gender"]
         if relayoutData:
             if "autosize" in relayoutData or "xaxis.autorange" in relayoutData:
