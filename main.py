@@ -12,6 +12,7 @@ from dash.dependencies import Input, Output
 from networkx.classes.graph import Graph
 from plotly.graph_objs import Scatter, Scatter3d
 
+from app import app
 from datasets import helper_text, load_data
 from viz import graph_edges, graph_nodes, unpack_edges, unpack_nodes
 
@@ -36,17 +37,8 @@ def get_visible_names(positions: Dict, visible: Dict) -> List:
     return new_coords.index.tolist()
 
 
-
 if __name__ == "__main__":
-    external_stylesheets = [
-        "http://berniesandersofficial.com/wp-includes/css/dist/block-library/style.min.css?ver=5.2.3",
-        "http://berniesandersofficial.com/wp-content/plugins/cpo-companion/assets/css/fontawesome.css?ver=5.2.3",
-        "http://berniesandersofficial.com/wp-content/plugins/kiwi-social-share/assets/vendors/icomoon/style.css?ver=2.0.15",
-        "http://berniesandersofficial.com/wp-content/themes/allegiant/core/css/base.css?ver=5.2.3",
-        "http://berniesandersofficial.com/wp-content/themes/allegiant/style.css?ver=5.2.3",
-    ]
     nodes, edges, network = load_data(id_field="Name", graph_dimensions=2)
-    app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
     node_adjacencies = []
     for adjacencies in network.adjacency():
