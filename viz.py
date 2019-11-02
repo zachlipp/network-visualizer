@@ -49,12 +49,13 @@ def unpack_nodes(network: Graph) -> Tuple[List[float]]:
     return transposed
 
 
-def graph_edges(x: List, y: List) -> Scatter:
+def graph_edges(x: List, y: List, z: List) -> Scatter3d:
     # TODO: Generalize
-    edge_trace = go.Scatter(
+    edge_trace = go.Scatter3d(
         x=x,
         y=y,
-        line=dict(width=0.5, color="#888"),
+        z=z,
+        line=dict(width=2, color="#888"),
         hoverinfo="none",
         mode="lines",
         showlegend=False,
@@ -63,16 +64,17 @@ def graph_edges(x: List, y: List) -> Scatter:
 
 
 def graph_nodes(
-    x: List, y: List, node_colors: List, node_text: List, ids: List
+    x: List, y: List, z: List, node_colors: List, node_text: List, ids: List
 ) -> Scatter3d:
     # TODO: Generalize
-    node_trace = go.Scatter(
+    node_trace = go.Scatter3d(
         x=x,
         y=y,
+        z=z,
         mode="markers",
         hoverinfo="text",
         showlegend=False,
-        marker=dict(color=node_colors, size=10, line_width=2),
+        marker=dict(color=node_colors, size=5, line_width=2),
     )
     node_trace.customdata = ids
     node_trace.text = node_text
@@ -99,11 +101,28 @@ def display_network(edge_trace: List, node_trace: List) -> dcc.Graph:
             layout=go.Layout(
                 hovermode="closest",
                 margin=dict(b=20, l=5, r=5, t=40),
-                xaxis=dict(
-                    showgrid=False, zeroline=False, showticklabels=False
-                ),
-                yaxis=dict(
-                    showgrid=False, zeroline=False, showticklabels=False
+                scene=dict(
+                    xaxis=dict(
+                        color="rgba(0,0,0,0)",
+                        showbackground=False,
+                        showgrid=False,
+                        zeroline=False,
+                        showticklabels=False,
+                    ),
+                    yaxis=dict(
+                        color="rgba(0,0,0,0)",
+                        showbackground=False,
+                        showgrid=False,
+                        zeroline=False,
+                        showticklabels=False,
+                    ),
+                    zaxis=dict(
+                        color="rgba(0,0,0,0)",
+                        showbackground=False,
+                        showgrid=False,
+                        zeroline=False,
+                        showticklabels=False,
+                    ),
                 ),
             ),
         ),

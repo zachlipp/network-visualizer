@@ -24,7 +24,7 @@ from viz import (
 )
 
 if __name__ == "__main__":
-    nodes, edges, network = load_data(id_field="Name", graph_dimensions=2)
+    nodes, edges, network = load_data(id_field="Name", graph_dimensions=3)
 
     nodes["color"] = nodes["Gender"].map({"male": "blue", "female": "red"})
     edge_trace = graph_edges(*unpack_edges(network))
@@ -54,7 +54,7 @@ if __name__ == "__main__":
             ),
         ]
     )
-
+    """
     @app.callback(
         Output("description", "data"), [Input("network", "relayoutData")]
     )
@@ -72,5 +72,5 @@ if __name__ == "__main__":
                 )
         else:
             return nodes[display].to_dict(orient="records")
-
+    """
     app.run_server(host="0.0.0.0", debug=True)
