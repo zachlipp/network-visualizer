@@ -1,8 +1,11 @@
 from typing import Dict, List, Tuple
 
+import dash_core_components as dcc
+import dash_table
 import pandas as pd
 import plotly.graph_objects as go
 from networkx.classes.graph import Graph
+from pandas.core.frame import DataFrame
 from plotly.graph_objs import Scatter, Scatter3d
 
 
@@ -74,3 +77,34 @@ def graph_nodes(
     node_trace.customdata = ids
     node_trace.text = node_text
     return node_trace
+
+
+def display_table(df: DataFrame, columns: List) -> dash_table.DataTable:
+    # Dash requires a list of dictionaries with "id", "name" fields
+    dash_columns = [{"id": column, "name": column} for column in columns]
+    # Data needs to be list of dictionaries for the HTML table
+    dash_data = df[columns].to_dict(orient="records")
+
+    data_table = dash_table.DataTable(
+        id="description", columns=dash_columns, data=dash_data
+    )
+    return data_table
+
+
+def display_network(edge_trace: List, node_trace: List) -> dcc.Graph:
+    return dcc.Graph(
+        id="network",
+        figure=go.Figure(
+            data=[edge_trace, node_trace],
+            layout=go.Layout(
+                hovermode="closest",
+                margin=dict(b=20, l=5, r=5, t=40),
+                xaxis=dict(
+                    showgrid=False, zeroline=False, showticklabels=False
+                ),
+                yaxis=dict(
+                    showgrid=False, zeroline=False, showticklabels=False
+                ),
+            ),
+        ),
+    )

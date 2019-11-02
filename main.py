@@ -14,7 +14,14 @@ from plotly.graph_objs import Scatter, Scatter3d
 
 from app import app, get_visible_names_2d
 from datasets import helper_text, load_data
-from viz import graph_edges, graph_nodes, unpack_edges, unpack_nodes
+from viz import (
+    display_network,
+    display_table,
+    graph_edges,
+    graph_nodes,
+    unpack_edges,
+    unpack_nodes,
+)
 
 if __name__ == "__main__":
     nodes, edges, network = load_data(id_field="Name", graph_dimensions=2)
@@ -41,46 +48,15 @@ if __name__ == "__main__":
         [
             html.H1("Network Visualizer", className="header"),
             html.Div(
-                [
-                    dcc.Graph(
-                        id="network",
-                        figure=go.Figure(
-                            data=[edge_trace, node_trace],
-                            layout=go.Layout(
-                                hovermode="closest",
-                                margin=dict(b=20, l=5, r=5, t=40),
-                                xaxis=dict(
-                                    showgrid=False,
-                                    zeroline=False,
-                                    showticklabels=False,
-                                ),
-                                yaxis=dict(
-                                    showgrid=False,
-                                    zeroline=False,
-                                    showticklabels=False,
-                                ),
-                            ),
-                        ),
-                    )
-                ],
+                [display_network(edge_trace, node_trace)],
                 className="graph-container",
             ),
             html.Div([html.P(helper_text)], className="text"),
             html.Div(
                 [
-                    dash_table.DataTable(
-                        id="description",
-                        columns=[
-                            {"id": c, "name": c}
-                            for c in [
-                                "Name",
-                                "Historical Significance",
-                                "Gender",
-                            ]
-                        ],
-                        data=nodes[
-                            ["Name", "Historical Significance", "Gender"]
-                        ].to_dict(orient="records"),
+                    display_table(
+                        df=nodes,
+                        columns=["Name", "Historical Significance", "Gender"],
                     )
                 ],
                 className="pandas",
@@ -92,7 +68,6 @@ if __name__ == "__main__":
         Output("description", "data"), [Input("network", "relayoutData")]
     )
     def update_table(relayoutData):
-        print(relayoutData)
         display = ["Name", "Historical Significance", "Gender"]
         if relayoutData:
             if "autosize" in relayoutData or "xaxis.autorange" in relayoutData:
