@@ -12,11 +12,8 @@ from dash.dependencies import Input, Output
 from networkx.classes.graph import Graph
 from plotly.graph_objs import Scatter, Scatter3d
 
-from datasets import load_data
+from datasets import helper_text, load_data
 from viz import graph_edges, graph_nodes, unpack_edges, unpack_nodes
-
-with open("lipsum.txt", "r") as infile:
-    helper_text = infile.read()
 
 
 def get_visible_names(positions: Dict, visible: Dict) -> List:
