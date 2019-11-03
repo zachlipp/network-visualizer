@@ -42,8 +42,10 @@ def find_nodes():
         select
 
             voterid,
-            md5(voters_firstname) as first_name,
-            md5(voters_lastname) as last_name,
+            ---md5(voters_firstname) as first_name,
+            ---md5(voters_lastname) as last_name,
+            voters_firstname as first_name,
+            voters_lastname as last_name,
             l2.voters_gender as gender,
             l2.precinct,
             l2.file_state
@@ -80,20 +82,21 @@ def load_data(
     id_field, source_field="source", target_field="target", graph_dimensions=2):
     """Obviously can modify with actual queries as needed"""
 
-    
+
     nodes = pd.read_csv(
         "/Users/gsanchez/Desktop/data/nodes.csv",
         sep=",")
+
 
     edges = pd.read_csv(
         "/Users/gsanchez/Desktop/data/edges.csv",
         sep=",")
 
-
-    #nodes = find_nodes()
+    '''
+    nodes = find_nodes()
     #edges = find_edges()
 
-    '''
+
     # person-level data
     nodes = pd.read_csv(
         "https://programminghistorian.org/assets/exploring-and-analyzing-network-data-with-python/quakers_nodelist.csv"
