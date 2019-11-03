@@ -24,15 +24,32 @@ from viz import (
 )
 
 if __name__ == "__main__":
-    nodes, edges, network = load_data(id_field="Name", graph_dimensions=3)
-
-    nodes["color"] = nodes["Gender"].map({"male": "blue", "female": "red"})
+    nodes, edges, network = load_data(id_field="voterid", graph_dimensions=3)
+    tall = edges.merge(nodes, left_on="source", right_on="voterid")
+    tall = tall.merge(nodes, left_on="target", right_on="voterid", suffixes=("_source", "_target"))
+    # M = Male / F = Female
+    nodes["color"] = nodes["gender"].map({"M": "blue", "F": "red"})
     edge_trace = graph_edges(*unpack_edges(network))
+
+    text = (
+        "First Name: " +
+        nodes["first_name"] +
+        "<br>" +
+        "Last Name: " +
+        nodes["last_name"] +
+        "<br>" +
+        "Precinct: " +
+        nodes["precinct"]
+    )
+
+    # text = ()'' nodes["first_name"] + '<br>' + nodes["last_name"] + '<br>' + nodes["last_name"]
+
     node_trace = graph_nodes(
         *unpack_nodes(network),
         node_colors=nodes["color"],
-        node_text=nodes["Name"],
-        ids=nodes["Name"]
+        # node_text=nodes["voterid"],
+        node_text=text,
+        ids=nodes["first_name"]
     )
 
     app.layout = html.Div(
@@ -46,8 +63,16 @@ if __name__ == "__main__":
             html.Div(
                 [
                     display_table(
-                        df=nodes,
-                        columns=["Name", "Historical Significance", "Gender"],
+                        df=tall,
+                        columns=[
+                            "first_name_target",
+                            "last_name_target",
+                            "gender_target",
+                            "precinct_target",
+                                "first_name_source",
+                                "last_name_source",
+                                "gender_source",
+                                "precinct_source",],
                     )
                 ],
                 className="pandas",

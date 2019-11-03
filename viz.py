@@ -11,7 +11,7 @@ from plotly.graph_objs import Scatter, Scatter3d
 
 def unpack_edges(network: Graph) -> Tuple[List[float]]:
     """Manipulates the wonky network data into wonky lists
-    
+
     Lists will be as follows:
     [point 1 x0, point 1 x1, np.nan, point 2 x0, point 2 x2, np.nan]
 
@@ -56,7 +56,7 @@ def graph_edges(x: List, y: List, z: List) -> Scatter3d:
         y=y,
         z=z,
         line=dict(width=2, color="#888"),
-        hoverinfo="none",
+        hoverinfo="skip",
         mode="lines",
         showlegend=False,
     )
@@ -73,8 +73,9 @@ def graph_nodes(
         z=z,
         mode="markers",
         hoverinfo="text",
-        showlegend=False,
+        showlegend=True,
         marker=dict(color=node_colors, size=5, line_width=2),
+        hoverlabel = dict(bgcolor=node_colors)
     )
     node_trace.customdata = ids
     node_trace.text = node_text
