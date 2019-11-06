@@ -47,8 +47,20 @@ if __name__ == "__main__":
             html.Div(
                 [
                     display_table(
+                        df=nodes[["Name"]],
+                        columns=["Name"],
+                        html_id="search",
+                        search=True,
+                    )
+                ],
+                className="search",
+            ),
+            html.Div(
+                [
+                    display_table(
                         df=nodes,
                         columns=["Name", "Historical Significance", "Gender"],
+                        html_id="nodes",
                     )
                 ],
                 className="pandas",
@@ -56,12 +68,11 @@ if __name__ == "__main__":
         ]
     )
 
-    @app.callback(
-        Output("description", "data"), [Input("description", "filter_query")]
-    )
-    def update_table(filter):
+    @app.callback(Output("search", "data"), [Input("search", "filter_query")])
+    def update_nodes(filter):
+        id_field = "Name"
         filtering_expressions = filter.split(" && ")
-        dff = nodes
+        dff = nodes[[id_field]]
         for filter_part in filtering_expressions:
             col_name, operator, filter_value = split_filter_part(filter_part)
             if operator in ("eq", "ne", "lt", "le", "gt", "ge"):
@@ -75,14 +86,11 @@ if __name__ == "__main__":
                 dff = dff.loc[dff[col_name].str.startswith(filter_value)]
         return dff.to_dict("records")
 
-    """
-    @app.callback(
-        Output("network", "selectedData"),
-        [Input("description", "filter_query")],
-    )
-    def update_network(filter):
+    @app.callback(Output("nodes", "data"), [Input("search", "filter_query")])
+    def update_nodes(filter):
+        id_field = "Name"
         filtering_expressions = filter.split(" && ")
-        dff = nodes 
+        dff = nodes[[id_field]]
         for filter_part in filtering_expressions:
             col_name, operator, filter_value = split_filter_part(filter_part)
             if operator in ("eq", "ne", "lt", "le", "gt", "ge"):
@@ -94,7 +102,6 @@ if __name__ == "__main__":
                 # this is a simplification of the front-end filtering logic,
                 # only works with complete fields in standard format
                 dff = dff.loc[dff[col_name].str.startswith(filter_value)]
-        return dff["voterid_target"].tolist()
-    """
+        return nodes[nodes[id_field].isin(dff[id_field])].to_dict("records")
 
     app.run_server(host="0.0.0.0", debug=True)

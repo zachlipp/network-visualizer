@@ -84,19 +84,27 @@ def graph_nodes(
     return node_trace
 
 
-def display_table(df: DataFrame, columns: List) -> dash_table.DataTable:
+def display_table(
+    df: DataFrame, columns: List, html_id: str, search=False
+) -> dash_table.DataTable:
     # Dash requires a list of dictionaries with "id", "name" fields
     dash_columns = [{"id": column, "name": column} for column in columns]
     # Data needs to be list of dictionaries for the HTML table
     dash_data = df[columns].to_dict(orient="records")
 
-    data_table = dash_table.DataTable(
-        id="description",
-        columns=dash_columns,
-        data=dash_data,
-        filter_action="custom",
-        filter_query="",
-    )
+    if search:
+        data_table = dash_table.DataTable(
+            id=html_id,
+            columns=dash_columns,
+            data=dash_data,
+            filter_action="custom",
+            filter_query="",
+        )
+
+    else:
+        data_table = dash_table.DataTable(
+            id=html_id, columns=dash_columns, data=dash_data
+        )
     return data_table
 
 
