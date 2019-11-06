@@ -49,30 +49,35 @@ def unpack_nodes(network: Graph) -> Tuple[List[float]]:
     return transposed
 
 
-def graph_edges(x: List, y: List) -> Scatter:
+def graph_edges(x: List, y: List, z: List, ids: List) -> Scatter3d:
     # TODO: Generalize
-    edge_trace = go.Scatter(
+    edge_trace = go.Scatter3d(
         x=x,
         y=y,
-        line=dict(width=0.5, color="#888"),
-        hoverinfo="none",
+        z=z,
+        line=dict(width=2, color="#888"),
+        hoverinfo="skip",
         mode="lines",
         showlegend=False,
     )
+    edge_trace.customdata = ids
+
     return edge_trace
 
 
 def graph_nodes(
-    x: List, y: List, node_colors: List, node_text: List, ids: List
+    x: List, y: List, z: List, node_colors: List, node_text: List, ids: List
 ) -> Scatter3d:
     # TODO: Generalize
-    node_trace = go.Scatter(
+    node_trace = go.Scatter3d(
         x=x,
         y=y,
+        z=z,
         mode="markers",
         hoverinfo="text",
-        showlegend=False,
-        marker=dict(color=node_colors, size=10, line_width=2),
+        showlegend=True,
+        marker=dict(color=node_colors, size=5, line_width=2),
+        hoverlabel=dict(bgcolor=node_colors),
     )
     node_trace.customdata = ids
     node_trace.text = node_text
@@ -86,9 +91,51 @@ def display_table(df: DataFrame, columns: List) -> dash_table.DataTable:
     dash_data = df[columns].to_dict(orient="records")
 
     data_table = dash_table.DataTable(
-        id="description", columns=dash_columns, data=dash_data
+        id="description",
+        columns=dash_columns,
+        data=dash_data,
+        filter_action="custom",
+        filter_query="",
     )
     return data_table
+
+
+operators = [
+    ["ge ", ">="],
+    ["le ", "<="],
+    ["lt ", "<"],
+    ["gt ", ">"],
+    ["ne ", "!="],
+    ["eq ", "="],
+    ["contains "],
+    ["datestartswith "],
+]
+
+
+def split_filter_part(filter_part):
+    for operator_type in operators:
+        for operator in operator_type:
+            if operator in filter_part:
+                name_part, value_part = filter_part.split(operator, 1)
+                name = name_part[
+                    name_part.find("{") + 1 : name_part.rfind("}")
+                ]
+
+                value_part = value_part.strip()
+                v0 = value_part[0]
+                if v0 == value_part[-1] and v0 in ("'", '"', "`"):
+                    value = value_part[1:-1].replace("\\" + v0, v0)
+                else:
+                    try:
+                        value = float(value_part)
+                    except ValueError:
+                        value = value_part
+
+                # word operators need spaces after them in the filter string,
+                # but we don't want these later
+                return name, operator_type[0].strip(), value
+
+    return [None] * 3
 
 
 def display_network(edge_trace: List, node_trace: List) -> dcc.Graph:
@@ -99,11 +146,28 @@ def display_network(edge_trace: List, node_trace: List) -> dcc.Graph:
             layout=go.Layout(
                 hovermode="closest",
                 margin=dict(b=20, l=5, r=5, t=40),
-                xaxis=dict(
-                    showgrid=False, zeroline=False, showticklabels=False
-                ),
-                yaxis=dict(
-                    showgrid=False, zeroline=False, showticklabels=False
+                scene=dict(
+                    xaxis=dict(
+                        color="rgba(0,0,0,0)",
+                        showbackground=False,
+                        showgrid=False,
+                        zeroline=False,
+                        showticklabels=False,
+                    ),
+                    yaxis=dict(
+                        color="rgba(0,0,0,0)",
+                        showbackground=False,
+                        showgrid=False,
+                        zeroline=False,
+                        showticklabels=False,
+                    ),
+                    zaxis=dict(
+                        color="rgba(0,0,0,0)",
+                        showbackground=False,
+                        showgrid=False,
+                        zeroline=False,
+                        showticklabels=False,
+                    ),
                 ),
             ),
         ),

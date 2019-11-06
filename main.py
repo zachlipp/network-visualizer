@@ -19,12 +19,14 @@ from viz import (
     display_table,
     graph_edges,
     graph_nodes,
+    operators,
+    split_filter_part,
     unpack_edges,
     unpack_nodes,
 )
 
 if __name__ == "__main__":
-    nodes, edges, network = load_data(id_field="Name", graph_dimensions=2)
+    nodes, edges, network = load_data(id_field="Name", graph_dimensions=3)
 
     nodes["color"] = nodes["Gender"].map({"male": "blue", "female": "red"})
     edge_trace = graph_edges(*unpack_edges(network))
@@ -56,21 +58,44 @@ if __name__ == "__main__":
     )
 
     @app.callback(
-        Output("description", "data"), [Input("network", "relayoutData")]
+        Output("description", "data"), [Input("description", "filter_query")]
     )
-    def update_table(relayoutData):
-        display = ["Name", "Historical Significance", "Gender"]
-        if relayoutData:
-            if "autosize" in relayoutData or "xaxis.autorange" in relayoutData:
-                return nodes[display].to_dict(orient="records")
-            else:
-                visible = get_visible_names_2d(
-                    nx.get_node_attributes(network, "position"), relayoutData
-                )
-                return nodes[nodes["Name"].isin(visible)][display].to_dict(
-                    orient="records"
-                )
-        else:
-            return nodes[display].to_dict(orient="records")
+    def update_table(filter):
+        filtering_expressions = filter.split(" && ")
+        dff = nodes
+        for filter_part in filtering_expressions:
+            col_name, operator, filter_value = split_filter_part(filter_part)
+            if operator in ("eq", "ne", "lt", "le", "gt", "ge"):
+                # these operators match pandas series operator method names
+                dff = dff.loc[getattr(dff[col_name], operator)(filter_value)]
+            elif operator == "contains":
+                dff = dff.loc[dff[col_name].str.contains(filter_value)]
+            elif operator == "datestartswith":
+                # this is a simplification of the front-end filtering logic,
+                # only works with complete fields in standard format
+                dff = dff.loc[dff[col_name].str.startswith(filter_value)]
+        return dff.to_dict("records")
+
+    """
+    @app.callback(
+        Output("network", "selectedData"),
+        [Input("description", "filter_query")],
+    )
+    def update_network(filter):
+        filtering_expressions = filter.split(" && ")
+        dff = nodes 
+        for filter_part in filtering_expressions:
+            col_name, operator, filter_value = split_filter_part(filter_part)
+            if operator in ("eq", "ne", "lt", "le", "gt", "ge"):
+                # these operators match pandas series operator method names
+                dff = dff.loc[getattr(dff[col_name], operator)(filter_value)]
+            elif operator == "contains":
+                dff = dff.loc[dff[col_name].str.contains(filter_value)]
+            elif operator == "datestartswith":
+                # this is a simplification of the front-end filtering logic,
+                # only works with complete fields in standard format
+                dff = dff.loc[dff[col_name].str.startswith(filter_value)]
+        return dff["voterid_target"].tolist()
+    """
 
     app.run_server(host="0.0.0.0", debug=True)
