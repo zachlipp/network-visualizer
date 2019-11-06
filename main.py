@@ -13,7 +13,7 @@ from networkx.classes.graph import Graph
 from plotly.graph_objs import Scatter, Scatter3d
 
 from app import app, get_visible_names_2d
-from datasets import helper_text, load_data
+from datasets import load_data
 from viz import (
     display_network,
     display_table,
@@ -44,7 +44,6 @@ if __name__ == "__main__":
                 [display_network(edge_trace, node_trace)],
                 className="graph-container",
             ),
-            html.Div([html.P(helper_text)], className="text"),
             html.Div(
                 [
                     display_table(
