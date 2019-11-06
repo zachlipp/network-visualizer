@@ -49,17 +49,19 @@ def unpack_nodes(network: Graph) -> Tuple[List[float]]:
     return transposed
 
 
-def graph_edges(x: List, y: List, z: List) -> Scatter3d:
+def graph_edges(x: List, y: List, z: List, ids: List) -> Scatter3d:
     # TODO: Generalize
     edge_trace = go.Scatter3d(
         x=x,
         y=y,
         z=z,
         line=dict(width=2, color="#888"),
-        hoverinfo="none",
+        hoverinfo="skip",
         mode="lines",
         showlegend=False,
     )
+    edge_trace.customdata = ids
+
     return edge_trace
 
 
@@ -73,8 +75,9 @@ def graph_nodes(
         z=z,
         mode="markers",
         hoverinfo="text",
-        showlegend=False,
+        showlegend=True,
         marker=dict(color=node_colors, size=5, line_width=2),
+        hoverlabel=dict(bgcolor=node_colors),
     )
     node_trace.customdata = ids
     node_trace.text = node_text
