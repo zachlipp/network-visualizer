@@ -34,7 +34,7 @@ if __name__ == "__main__":
         *unpack_nodes(network),
         node_colors=nodes["color"],
         node_text=nodes["Name"],
-        ids=nodes["Name"]
+        ids=nodes["Name"],
     )
 
     app.layout = html.Div(
@@ -46,7 +46,7 @@ if __name__ == "__main__":
             ),
             html.Div(
                 [
-                    html.H3("Search"),
+                    html.H3("Search", id="search-title"),
                     display_table(
                         df=nodes[["Name"]],
                         columns=["Name"],
@@ -58,7 +58,7 @@ if __name__ == "__main__":
             ),
             html.Div(
                 [
-                    html.H3("Source"),
+                    html.H3("Source", id="source-title"),
                     display_table(
                         df=nodes,
                         columns=["Name", "Historical Significance", "Gender"],
@@ -69,7 +69,7 @@ if __name__ == "__main__":
             ),
             html.Div(
                 [
-                    html.H3("Target"),
+                    html.H3("Target", id="target-title"),
                     display_table(
                         df=nodes,
                         columns=["Name", "Historical Significance", "Gender"],
@@ -99,6 +99,7 @@ if __name__ == "__main__":
                 dff = dff.loc[dff[col_name].str.startswith(filter_value)]
         return dff.to_dict("records")
 
+    # Update the source data table
     @app.callback(Output("source", "data"), [Input("search", "active_cell")])
     def update_sources(
         selection,
@@ -122,6 +123,7 @@ if __name__ == "__main__":
         else:
             return nodes[columns].to_dict("records")
 
+    # Update the target data table
     @app.callback(Output("target", "data"), [Input("search", "active_cell")])
     def update_targets(
         selection,
@@ -144,5 +146,33 @@ if __name__ == "__main__":
             return targets[columns].to_dict("records")
         else:
             return nodes[columns].to_dict("records")
+
+    # Update the target header
+    @app.callback(
+        Output("target-title", "children"), [Input("search", "active_cell")]
+    )
+    def update_target_header(selection, id_field="Name"):
+        sorted_names = nodes[id_field].sort_values().tolist()
+        if selection:
+            # Get occurrences of name in the source file
+            row_index = selection["row"]
+            person_id = sorted_names[row_index]
+            return f"These people contacted {person_id}..."
+        else:
+            return "Source"
+
+    # Update the source header
+    @app.callback(
+        Output("source-title", "children"), [Input("search", "active_cell")]
+    )
+    def update_source_header(selection, id_field="Name"):
+        sorted_names = nodes[id_field].sort_values().tolist()
+        if selection:
+            # Get occurrences of name in the source file
+            row_index = selection["row"]
+            person_id = sorted_names[row_index]
+            return f"{person_id} contacted these people..."
+        else:
+            return "Source"
 
     app.run_server(host="0.0.0.0", debug=True)
