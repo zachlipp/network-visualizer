@@ -92,23 +92,20 @@ def display_table(
     # Data needs to be list of dictionaries for the HTML table
     dash_data = df[columns].to_dict(orient="records")
 
+    style = {"maxHeight": 350, "overflowY": "scroll"}
+    kwargs = {
+        "id": html_id,
+        "columns": dash_columns,
+        "data": dash_data,
+        "style_table": style,
+    }
     if search:
         data_table = dash_table.DataTable(
-            id=html_id,
-            columns=dash_columns,
-            data=dash_data,
-            filter_action="custom",
-            filter_query="",
-            style_table={"maxHeight": 350, "overflowY": "scroll"},
+            filter_action="custom", filter_query="", **kwargs
         )
 
     else:
-        data_table = dash_table.DataTable(
-            id=html_id,
-            columns=dash_columns,
-            data=dash_data,
-            style_table={"maxHeight": 350, "overflowY": "scroll"},
-        )
+        data_table = dash_table.DataTable(**kwargs)
     return data_table
 
 
