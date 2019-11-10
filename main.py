@@ -100,19 +100,23 @@ if __name__ == "__main__":
         return dff.to_dict("records")
 
     # Update the source data table
-    @app.callback(Output("source", "data"), [Input("search", "active_cell")])
+    @app.callback(
+        Output("source", "data"),
+        [Input("search", "active_cell"), Input("search", "data")],
+    )
     def update_sources(
         selection,
+        data,
         id_field="Name",
         target_field="Target",
         source_field="Source",
     ):
+        print(data)
         columns = ["Name", "Historical Significance", "Gender"]
-        sorted_names = nodes[id_field].sort_values().tolist()
         if selection:
             # Get occurrences of name in the source file
             row_index = selection["row"]
-            person_id = sorted_names[row_index]
+            person_id = data[row_index][id_field]
 
             # The people this person sourced
             source_names = edges[edges[source_field] == person_id][
@@ -124,19 +128,22 @@ if __name__ == "__main__":
             return nodes[columns].to_dict("records")
 
     # Update the target data table
-    @app.callback(Output("target", "data"), [Input("search", "active_cell")])
+    @app.callback(
+        Output("target", "data"),
+        [Input("search", "active_cell"), Input("search", "data")],
+    )
     def update_targets(
         selection,
+        data,
         id_field="Name",
         target_field="Target",
         source_field="Source",
     ):
         columns = ["Name", "Historical Significance", "Gender"]
-        sorted_names = nodes[id_field].sort_values().tolist()
         if selection:
             # Get occurrences of name in the source file
             row_index = selection["row"]
-            person_id = sorted_names[row_index]
+            person_id = data[row_index][id_field]
 
             # The people who sourced this person
             target_names = edges[edges[target_field] == person_id][
@@ -149,28 +156,28 @@ if __name__ == "__main__":
 
     # Update the target header
     @app.callback(
-        Output("target-title", "children"), [Input("search", "active_cell")]
+        Output("target-title", "children"),
+        [Input("search", "active_cell"), Input("search", "data")],
     )
-    def update_target_header(selection, id_field="Name"):
-        sorted_names = nodes[id_field].sort_values().tolist()
+    def update_target_header(selection, data, id_field="Name"):
         if selection:
             # Get occurrences of name in the source file
             row_index = selection["row"]
-            person_id = sorted_names[row_index]
+            person_id = data[row_index][id_field]
             return f"These people contacted {person_id}..."
         else:
             return "Source"
 
     # Update the source header
     @app.callback(
-        Output("source-title", "children"), [Input("search", "active_cell")]
+        Output("source-title", "children"),
+        [Input("search", "active_cell"), Input("search", "data")],
     )
-    def update_source_header(selection, id_field="Name"):
-        sorted_names = nodes[id_field].sort_values().tolist()
+    def update_source_header(selection, data, id_field="Name"):
         if selection:
             # Get occurrences of name in the source file
             row_index = selection["row"]
-            person_id = sorted_names[row_index]
+            person_id = data[row_index][id_field]
             return f"{person_id} contacted these people..."
         else:
             return "Source"
