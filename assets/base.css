@@ -24,7 +24,7 @@
   width: 30%;
   height: 350px;
   display: inline-block;
-  overflow: scroll;
+  overflow: hidden;
 }
 
 .table-wide {
@@ -33,12 +33,12 @@
   width: 45%;
   height: 350px;
   display: inline-block;
-  overflow: scroll;
+  overflow: hidden;
 }
 
 .pandas {
   width: 1000px;
   height: 500px;
   margin: auto;
-  overflow: scroll;
+  overflow: hidden;
 }
