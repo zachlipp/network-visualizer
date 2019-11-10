@@ -18,14 +18,22 @@
   display: inline-block;
 }
 
-.search {
+.table {
   margin-left: 20px;
   margin-right: 20px;
   width: 30%;
   height: 350px;
   display: inline-block;
   overflow: scroll;
+}
 
+.table-wide {
+  margin-left: 20px;
+  margin-right: 20px;
+  width: 45%;
+  height: 350px;
+  display: inline-block;
+  overflow: scroll;
 }
 
 .pandas {

@@ -54,17 +54,29 @@ if __name__ == "__main__":
                         search=True,
                     ),
                 ],
-                className="search",
+                className="table",
             ),
             html.Div(
                 [
+                    html.H3("Source"),
                     display_table(
                         df=nodes,
                         columns=["Name", "Historical Significance", "Gender"],
-                        html_id="nodes",
-                    )
+                        html_id="source",
+                    ),
                 ],
-                className="pandas",
+                className="table-wide",
+            ),
+            html.Div(
+                [
+                    html.H3("Target"),
+                    display_table(
+                        df=nodes,
+                        columns=["Name", "Historical Significance", "Gender"],
+                        html_id="target",
+                    ),
+                ],
+                className="table-wide",
             ),
         ]
     )
@@ -87,7 +99,7 @@ if __name__ == "__main__":
                 dff = dff.loc[dff[col_name].str.startswith(filter_value)]
         return dff.to_dict("records")
 
-    @app.callback(Output("nodes", "data"), [Input("search", "filter_query")])
+    @app.callback(Output("source", "data"), [Input("search", "filter_query")])
     def update_nodes(filter):
         id_field = "Name"
         filtering_expressions = filter.split(" && ")
