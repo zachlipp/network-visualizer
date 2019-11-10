@@ -3,9 +3,6 @@ import pandas as pd
 from networkx.classes.graph import Graph
 from pandas.core.frame import DataFrame
 
-with open("lipsum.txt", "r") as infile:
-    helper_text = infile.read()
-
 
 def sort_nodes_by_graph(
     nodes: DataFrame, network: Graph, id_field: str
