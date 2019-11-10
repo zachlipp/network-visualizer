@@ -46,12 +46,13 @@ if __name__ == "__main__":
             ),
             html.Div(
                 [
+                    html.H3("Search"),
                     display_table(
                         df=nodes[["Name"]],
                         columns=["Name"],
                         html_id="search",
                         search=True,
-                    )
+                    ),
                 ],
                 className="search",
             ),
