@@ -26,15 +26,30 @@ from viz import (
 )
 
 if __name__ == "__main__":
-    nodes, edges, network = load_data(id_field="Name", graph_dimensions=3)
+    nodes, edges, network = load_data(id_field="voterid", graph_dimensions=3)
 
-    nodes["color"] = nodes["Gender"].map({"male": "blue", "female": "red"})
-    edge_trace = graph_edges(*unpack_edges(network), nodes["Name"])
+    nodes["color"] = nodes["gender"].map({"M": "blue", "F": "red"})
+    edge_trace = graph_edges(*unpack_edges(network), nodes["voterid"])
+
+    text = (
+        "ID: " +
+        nodes["voterid"] +
+        "<br>" +
+        "First Name: " +
+        nodes["first_name"] +
+        "<br>" +
+        "Last Name: " +
+        nodes["last_name"] +
+        "<br>" +
+        "Precinct: " +
+        nodes["precinct"]
+    )
+
     node_trace = graph_nodes(
         *unpack_nodes(network),
         node_colors=nodes["color"],
-        node_text=nodes["Name"],
-        ids=nodes["Name"],
+        node_text=text,
+        ids=nodes["voterid"],
     )
 
     app.layout = html.Div(
@@ -48,8 +63,8 @@ if __name__ == "__main__":
                 [
                     html.H3("Search", id="search-title"),
                     display_table(
-                        df=nodes[["Name"]],
-                        columns=["Name"],
+                        df=nodes[["voterid"]],
+                        columns=["voterid"],
                         html_id="search",
                         search=True,
                     ),
@@ -58,10 +73,10 @@ if __name__ == "__main__":
             ),
             html.Div(
                 [
-                    html.H3("Source", id="source-title"),
+                    html.H3("source", id="source-title"),
                     display_table(
                         df=nodes,
-                        columns=["Name", "Historical Significance", "Gender"],
+                        columns=["first_name", "last_name"],
                         html_id="source",
                     ),
                 ],
@@ -69,10 +84,10 @@ if __name__ == "__main__":
             ),
             html.Div(
                 [
-                    html.H3("Target", id="target-title"),
+                    html.H3("target", id="target-title"),
                     display_table(
                         df=nodes,
-                        columns=["Name", "Historical Significance", "Gender"],
+                        columns=["first_name", "last_name"],
                         html_id="target",
                     ),
                 ],
@@ -82,8 +97,8 @@ if __name__ == "__main__":
     )
 
     @app.callback(Output("search", "data"), [Input("search", "filter_query")])
-    def update_names(filter, id_field="Name"):
-        id_field = "Name"
+    def update_names(filter, id_field="voterid"):
+        id_field = "voterid"
         filtering_expressions = filter.split(" && ")
         dff = nodes[[id_field]].sort_values(id_field)
         for filter_part in filtering_expressions:
@@ -107,12 +122,12 @@ if __name__ == "__main__":
     def update_sources(
         selection,
         data,
-        id_field="Name",
-        target_field="Target",
-        source_field="Source",
+        id_field="voterid",
+        target_field="target",
+        source_field="source",
     ):
         print(data)
-        columns = ["Name", "Historical Significance", "Gender"]
+        columns = ["voterid", "first_name", "last_name"]
         if selection:
             # Get occurrences of name in the source file
             row_index = selection["row"]
@@ -135,11 +150,11 @@ if __name__ == "__main__":
     def update_targets(
         selection,
         data,
-        id_field="Name",
-        target_field="Target",
-        source_field="Source",
+        id_field="voterid",
+        target_field="target",
+        source_field="source",
     ):
-        columns = ["Name", "Historical Significance", "Gender"]
+        columns = ["voterid", "first_name", "last_name"]
         if selection:
             # Get occurrences of name in the source file
             row_index = selection["row"]
@@ -159,27 +174,27 @@ if __name__ == "__main__":
         Output("target-title", "children"),
         [Input("search", "active_cell"), Input("search", "data")],
     )
-    def update_target_header(selection, data, id_field="Name"):
+    def update_target_header(selection, data, id_field="voterid"):
         if selection:
             # Get occurrences of name in the source file
             row_index = selection["row"]
             person_id = data[row_index][id_field]
             return f"These people contacted {person_id}..."
         else:
-            return "Source"
+            return "target"
 
     # Update the source header
     @app.callback(
         Output("source-title", "children"),
         [Input("search", "active_cell"), Input("search", "data")],
     )
-    def update_source_header(selection, data, id_field="Name"):
+    def update_source_header(selection, data, id_field="voterid"):
         if selection:
             # Get occurrences of name in the source file
             row_index = selection["row"]
             person_id = data[row_index][id_field]
             return f"{person_id} contacted these people..."
         else:
-            return "Source"
+            return "source"
 
     app.run_server(host="0.0.0.0", debug=True)
