@@ -25,6 +25,15 @@ from viz import (
     unpack_nodes,
 )
 
+COLUMNS = [
+    "voter_id",
+    "first_name",
+    "last_name",
+    "phone",
+    "precinct",
+    "support",
+]
+
 if __name__ == "__main__":
     nodes, edges, network = mock_data()
 
@@ -55,9 +64,12 @@ if __name__ == "__main__":
             html.Div(
                 [
                     html.H3("Search", id="search-title"),
+                    html.P(
+                        'Quote spaces in your filter, e.g. search "1 - Support" and not 1 - Support'
+                    ),
                     display_table(
-                        df=nodes[["voter_id"]],
-                        columns=["voter_id"],
+                        df=nodes[COLUMNS],
+                        columns=COLUMNS,
                         html_id="search",
                         search=True,
                     ),
@@ -68,14 +80,7 @@ if __name__ == "__main__":
                 [
                     html.H3("Source", id="source-title"),
                     display_table(
-                        df=nodes,
-                        columns=[
-                            "voter_id",
-                            "first_name",
-                            "last_name",
-                            "support",
-                        ],
-                        html_id="source",
+                        df=nodes[COLUMNS], columns=COLUMNS, html_id="source"
                     ),
                 ],
                 className="table-wide",
@@ -84,14 +89,7 @@ if __name__ == "__main__":
                 [
                     html.H3("Target", id="target-title"),
                     display_table(
-                        df=nodes,
-                        columns=[
-                            "voter_id",
-                            "first_name",
-                            "last_name",
-                            "support",
-                        ],
-                        html_id="target",
+                        df=nodes[COLUMNS], columns=COLUMNS, html_id="target"
                     ),
                 ],
                 className="table-wide",
@@ -103,7 +101,7 @@ if __name__ == "__main__":
     def update_names(filter):
         id_field = "voter_id"
         filtering_expressions = filter.split(" && ")
-        dff = nodes[[id_field]].sort_values(id_field)
+        dff = nodes.sort_values(id_field)
         for filter_part in filtering_expressions:
             col_name, operator, filter_value = split_filter_part(filter_part)
             if operator in ("eq", "ne", "lt", "le", "gt", "ge"):
@@ -129,8 +127,6 @@ if __name__ == "__main__":
         target_field="target",
         source_field="source",
     ):
-        print(data)
-        columns = ["voter_id", "first_name", "last_name", "support"]
         if selection:
             # Get occurrences of name in the source file
             row_index = selection["row"]
@@ -141,9 +137,9 @@ if __name__ == "__main__":
                 target_field
             ].tolist()
             sources = nodes[nodes[id_field].isin(source_names)]
-            return sources[columns].to_dict("records")
+            return sources[COLUMNS].to_dict("records")
         else:
-            return nodes[columns].to_dict("records")
+            return nodes[COLUMNS].to_dict("records")
 
     # Update the target data table
     @app.callback(
@@ -157,7 +153,6 @@ if __name__ == "__main__":
         target_field="target",
         source_field="source",
     ):
-        columns = ["voter_id", "first_name", "last_name", "support"]
         if selection:
             # Get occurrences of name in the source file
             row_index = selection["row"]
@@ -168,22 +163,26 @@ if __name__ == "__main__":
                 source_field
             ].tolist()
             targets = nodes[nodes[id_field].isin(target_names)]
-            return targets[columns].to_dict("records")
+            return targets[COLUMNS].to_dict("records")
         else:
-            return nodes[columns].to_dict("records")
+            return nodes[COLUMNS].to_dict("records")
 
     # Update the target header
     @app.callback(
         Output("target-title", "children"),
         [Input("search", "active_cell"), Input("search", "data")],
     )
-    def update_target_header(selection, data, id_field="voter_id"):
+    def update_target_header(
+        selection,
+        data,
+        id_field="voter_id",
+        print_fields=["first_name", "last_name"],
+    ):
         if selection:
             # Get occurrences of name in the source file
-            print(selection)
             row_index = selection["row"]
-            person_id = data[row_index][id_field]
-            return f"These people contacted {person_id}..."
+            name = " ".join(data[row_index][x] for x in print_fields)
+            return f"These people contacted {name}..."
         else:
             return "Source"
 
@@ -192,12 +191,17 @@ if __name__ == "__main__":
         Output("source-title", "children"),
         [Input("search", "active_cell"), Input("search", "data")],
     )
-    def update_source_header(selection, data, id_field="voter_id"):
+    def update_source_header(
+        selection,
+        data,
+        id_field="voter_id",
+        print_fields=["first_name", "last_name"],
+    ):
         if selection:
             # Get occurrences of name in the source file
             row_index = selection["row"]
-            person_id = data[row_index][id_field]
-            return f"{person_id} contacted these people..."
+            name = " ".join(data[row_index][x] for x in print_fields)
+            return f"These people contacted {name}..."
         else:
             return "Source"
 
