@@ -1,7 +1,10 @@
 import networkx as nx
+import numpy as np
 import pandas as pd
 from networkx.classes.graph import Graph
 from pandas.core.frame import DataFrame
+
+np.random.seed(538)
 
 
 def sort_nodes_by_graph(
@@ -15,6 +18,67 @@ def sort_nodes_by_graph(
     graph_node_order = list(network.nodes())
     nodes.graph_order.cat.set_categories(graph_node_order, inplace=True)
     return nodes.sort_values("graph_order")
+
+
+def make_nodes(n):
+    voter_ids = [f"IA-{_id}" for _id in np.random.randint(0, 100_000, n)]
+    first_names = np.random.choice(
+        ["Steve", "Jane", "Bob", "Mary", "Mike", "Sarah"], n
+    )
+    last_names = np.random.choice(["Johnson", "Smith", "Jackson"], n)
+    phones = np.random.randint(0, 10000, n)
+    precincts = np.random.randint(0, 5, n)
+    supports = np.random.choice(
+        [
+            "1 - Support",
+            "2 - Lean Support",
+            "3 - Undecided",
+            "4 - Lean Oppose",
+            "5 - Oppose",
+        ],
+        n,
+    )
+
+    return pd.DataFrame(
+        {
+            "voter_id": voter_ids,
+            "first_name": first_names,
+            "last_name": last_names,
+            "phone": phones,
+            "precinct": precincts,
+            "support": supports,
+        }
+    )
+
+
+def make_edges(nodes, n, source_field, target_field):
+    assert n > nodes.shape[0]
+
+    # Generate too many points, discard invalid ones
+    pairs = np.random.choice(nodes["voter_id"], size=(n * 5, 2))
+    df = pd.DataFrame(pairs)
+
+    df.drop_duplicates(inplace=True)
+    unique = df[df[0] != df[1]]
+
+    # May error if proportions are off
+    sample = unique.sample(n)
+    sample.columns = [source_field, target_field]
+    return sample
+
+
+def mock_data(n_nodes=100, n_edges=150, dim=3):
+    source = "source"
+    target = "target"
+    nodes = make_nodes(n_nodes)
+    edges = make_edges(nodes, n_edges, source, target)
+    network = nx.from_pandas_edgelist(edges, source, target)
+    # initalizing a graph doesn't do anything, so we add some math to spread points out
+    positions = nx.spring_layout(network, dim=dim)
+    nx.set_node_attributes(network, name="position", values=positions)
+
+    nodes = sort_nodes_by_graph(nodes, network, "voter_id")
+    return nodes, edges, network
 
 
 def load_data(
