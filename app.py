@@ -1,11 +1,9 @@
 from typing import Dict, List, Tuple
 
 import dash
-import dash_core_components as dcc
-import dash_html_components as html
-import dash_table
 import pandas as pd
 import plotly.graph_objects as go
+from dash import dash_table, dcc, html
 from dash.dependencies import Input, Output
 
 external_stylesheets = [

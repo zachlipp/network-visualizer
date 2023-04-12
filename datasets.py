@@ -11,12 +11,12 @@ def sort_nodes_by_graph(
     nodes: DataFrame, network: Graph, id_field: str
 ) -> DataFrame:
     """Sorts the nodes table by the values in the graph
-    
+
     This ensures the data in the network and the data in the table match
     """
     nodes["graph_order"] = nodes[id_field].astype("category")
     graph_node_order = list(network.nodes())
-    nodes.graph_order.cat.set_categories(graph_node_order, inplace=True)
+    nodes.graph_order = nodes.graph_order.cat.set_categories(graph_node_order)
     return nodes.sort_values("graph_order")
 
 

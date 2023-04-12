@@ -1,9 +1,8 @@
 from typing import Dict, List, Tuple
 
-import dash_core_components as dcc
-import dash_table
 import pandas as pd
 import plotly.graph_objects as go
+from dash import dash_table, dcc
 from networkx.classes.graph import Graph
 from pandas.core.frame import DataFrame
 from plotly.graph_objs import Scatter, Scatter3d
@@ -11,7 +10,7 @@ from plotly.graph_objs import Scatter, Scatter3d
 
 def unpack_edges(network: Graph) -> Tuple[List[float]]:
     """Manipulates the wonky network data into wonky lists
-    
+
     Lists will be as follows:
     [point 1 x0, point 1 x1, np.nan, point 2 x0, point 2 x2, np.nan]
 
@@ -25,8 +24,8 @@ def unpack_edges(network: Graph) -> Tuple[List[float]]:
         target = edge[1]
 
         # "position" is an array with one element per network dimension
-        source_coords = network.node[source]["position"]
-        target_coords = network.node[target]["position"]
+        source_coords = network.nodes[source]["position"]
+        target_coords = network.nodes[target]["position"]
         padding = [None for _ in source_coords]
 
         positions.append(source_coords)
@@ -41,7 +40,7 @@ def unpack_edges(network: Graph) -> Tuple[List[float]]:
 def unpack_nodes(network: Graph) -> Tuple[List[float]]:
     positions = []
     for node in network.nodes():
-        position = network.node[node]["position"]
+        position = network.nodes[node]["position"]
         positions.append(position)
 
     # Transpose the list to get ndim lists of len(network.edges())

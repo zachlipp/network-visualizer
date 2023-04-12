@@ -1,13 +1,11 @@
 from typing import Dict, List, Tuple
 
 import dash
-import dash_core_components as dcc
-import dash_html_components as html
-import dash_table
 import networkx as nx
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
+from dash import dash_table, dcc, html
 from dash.dependencies import Input, Output
 from networkx.classes.graph import Graph
 from plotly.graph_objs import Scatter, Scatter3d
