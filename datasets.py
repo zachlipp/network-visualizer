@@ -27,7 +27,7 @@ def make_nodes(n):
         ["Steve", "Jane", "Bob", "Mary", "Mike", "Sarah"], n
     )
     last_names = np.random.choice(["Johnson", "Smith", "Jackson"], n)
-    phones = np.random.randint(0, 10000, n)
+    phones = f"(123)-555-0123"
     precincts = np.random.randint(0, 5, n)
     supports = np.random.choice(
         [

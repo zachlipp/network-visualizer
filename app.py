@@ -7,8 +7,7 @@ from dash import dash_table, dcc, html
 from dash.dependencies import Input, Output
 
 
-app = dash.Dash(__name__, external_stylesheets=["./assets/base.css"])
-
+app = dash.Dash(__name__)
 app.config.suppress_callback_exceptions = True
 
 

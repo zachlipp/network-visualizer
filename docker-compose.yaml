@@ -7,3 +7,9 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8050:8050"
+    # This is written on build normally, but
+    # mounting the volumes allows the debug server
+    # to detect local changes to files and automatically
+    # reload
+    volumes:
+      - .:/home

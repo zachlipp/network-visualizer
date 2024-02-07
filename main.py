@@ -78,7 +78,7 @@ if __name__ == "__main__":
                         search=True,
                     ),
                 ],
-                className="table",
+                className="table-wide",
             ),
             html.Div(
                 [
