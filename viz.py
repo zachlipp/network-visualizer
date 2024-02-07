@@ -1,11 +1,11 @@
-from typing import Dict, List, Tuple
+from typing import List, Tuple
 
 import pandas as pd
 import plotly.graph_objects as go
 from dash import dash_table, dcc
 from networkx.classes.graph import Graph
 from pandas.core.frame import DataFrame
-from plotly.graph_objs import Scatter, Scatter3d
+from plotly.graph_objs import Scatter3d
 
 
 def unpack_edges(network: Graph) -> Tuple[List[float]]:

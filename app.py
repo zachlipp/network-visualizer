@@ -1,11 +1,7 @@
-from typing import Dict, List, Tuple
+from typing import Dict, List
 
 import dash
 import pandas as pd
-import plotly.graph_objects as go
-from dash import dash_table, dcc, html
-from dash.dependencies import Input, Output
-
 
 app = dash.Dash(__name__)
 app.config.suppress_callback_exceptions = True

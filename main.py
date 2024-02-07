@@ -1,13 +1,5 @@
-from typing import Dict, List, Tuple
-
-import dash
-import networkx as nx
-import numpy as np
-import pandas as pd
-import plotly.graph_objects as go
-from dash import dash_table, dcc, html
+from dash import html
 from dash.dependencies import Input, Output
-from networkx.classes.graph import Graph
 
 from app import app
 from datasets import mock_data
@@ -16,12 +8,9 @@ from viz import (
     display_table,
     graph_edges,
     graph_nodes,
-    operators,
     split_filter_part,
     unpack_edges,
     unpack_nodes,
-    split_filter_part,
-    operators,
 )
 
 COLUMNS = [
@@ -68,7 +57,10 @@ if __name__ == "__main__":
                 [
                     html.H3("Search", id="search-title"),
                     html.P(
-                        'Quote spaces in your filter, e.g. search "1 - Support" and not 1 - Support'
+                        """
+                        Quote spaces in your filter, e.g.
+                        search "1 - Support" and not 1 - Support
+                        """
                     ),
                     display_table(
                         df=nodes[COLUMNS],
