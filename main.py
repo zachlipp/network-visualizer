@@ -1,3 +1,5 @@
+import networkx as nx
+import pandas as pd
 from dash import html
 from dash.dependencies import Input, Output
 
@@ -33,13 +35,12 @@ if __name__ == "__main__":
         suffixes=("_source", "_target"),
         how="left",
     )
+
     # M = Male / F = Female
     nodes["color"] = nodes["gender"].map({"M": "blue", "F": "red", "O": "grey"})
-    edge_trace = graph_edges(*unpack_edges(network), ids=nodes["voter_id"])
-
+    full_edge_trace = graph_edges(*unpack_edges(network), ids=nodes["voter_id"])
     text = nodes["first_name"] + " " + nodes["last_name"]
-
-    node_trace = graph_nodes(
+    full_node_trace = graph_nodes(
         *unpack_nodes(network),
         node_colors=nodes["color"],
         node_text=text,
@@ -50,8 +51,9 @@ if __name__ == "__main__":
         [
             html.H1("Network Visualizer", className="header"),
             html.Div(
-                [display_network(edge_trace, node_trace)],
+                [display_network(full_edge_trace, full_node_trace)],
                 className="graph-container",
+                id="graph-viz"
             ),
             html.Div(
                 [
@@ -202,6 +204,37 @@ if __name__ == "__main__":
             return targets[COLUMNS].to_dict("records")
         else:
             return nodes[COLUMNS].to_dict("records")
+
+    @app.callback(
+        Output("graph-viz", "children"),
+        [Input("search", "active_cell"), Input("search", "data")],
+    )
+    def update_network(selection, data, id_field="voter_id"):
+        if selection:
+            row_index = selection["row"]
+            person_id = data[row_index][id_field]
+            subgraph = nx.subgraph_view(
+                network,
+                filter_edge=lambda source, target: source == person_id
+                or target == person_id,
+            )
+            # Subgraphs with filter_edge includes all nodes.
+            # Subgraphs with filter_node do not include all edges.
+            # Least gross way to do this
+            filtered_edges = pd.DataFrame(subgraph.edges, columns=["source", "target"])
+            filtered_nodes = nodes[nodes.voter_id.isin(filtered_edges.source) | nodes.voter_id.isin(filtered_edges.target)]
+            # TODO: Filter nodes
+            edge_trace = graph_edges(*unpack_edges(subgraph), ids=filtered_nodes["voter_id"])
+            node_trace = graph_nodes(
+                *unpack_nodes(subgraph),
+                node_colors=filtered_nodes["color"],
+                node_text=text,
+                ids=filtered_nodes["voter_id"],
+            )
+
+            return display_network(edge_trace, node_trace)
+        else:
+            return display_network(full_edge_trace, full_node_trace)
 
     # Update the target header
     @app.callback(
