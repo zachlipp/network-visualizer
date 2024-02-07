@@ -8,7 +8,6 @@ import plotly.graph_objects as go
 from dash import dash_table, dcc, html
 from dash.dependencies import Input, Output
 from networkx.classes.graph import Graph
-from plotly.graph_objs import Scatter, Scatter3d
 
 from app import app
 from datasets import mock_data
@@ -229,7 +228,7 @@ if __name__ == "__main__":
             name = " ".join(data[row_index][x] for x in print_fields)
             return f"{name} contacted these people..."
         else:
-            return "Source"
+            return "Target"
 
     # Update the source header
     @app.callback(
