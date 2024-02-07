@@ -10,7 +10,7 @@ from dash.dependencies import Input, Output
 from networkx.classes.graph import Graph
 from plotly.graph_objs import Scatter, Scatter3d
 
-from app import app, get_visible_names_2d
+from app import app
 from datasets import mock_data
 from viz import (
     display_network,
@@ -21,6 +21,8 @@ from viz import (
     split_filter_part,
     unpack_edges,
     unpack_nodes,
+    split_filter_part,
+    operators,
 )
 
 COLUMNS = [
@@ -30,25 +32,29 @@ COLUMNS = [
     "phone",
     "precinct",
     "support",
+    "gender",
 ]
 
 if __name__ == "__main__":
     nodes, edges, network = mock_data()
-
-    nodes["color"] = nodes["support"].map(
-        {
-            "1 - Support": "#0062FF",
-            "2 - Lean Support": "#00FFFE",
-            "3 - Undecided": "grey",
-            "4 - Lean Oppose": "#CB0532",
-            "5 - Oppose": "#FF090E",
-        }
+    tall = edges.merge(nodes, left_on="source", right_on="voter_id", how="left")
+    tall = tall.merge(
+        nodes,
+        left_on="target",
+        right_on="voter_id",
+        suffixes=("_source", "_target"),
+        how="left",
     )
-    edge_trace = graph_edges(*unpack_edges(network), nodes["voter_id"])
+    # M = Male / F = Female
+    nodes["color"] = nodes["gender"].map({"M": "blue", "F": "red", "O": "grey"})
+    edge_trace = graph_edges(*unpack_edges(network), ids=nodes["voter_id"])
+
+    text = nodes["first_name"] + " " + nodes["last_name"]
+
     node_trace = graph_nodes(
         *unpack_nodes(network),
         node_colors=nodes["color"],
-        node_text=nodes["first_name"],
+        node_text=text,
         ids=nodes["voter_id"],
     )
 
@@ -95,6 +101,27 @@ if __name__ == "__main__":
         ]
     )
 
+    @app.callback(
+        Output("description", "data"),
+        [Input("description", "filter_query")],
+        supress_callback_exceptions=True,
+    )
+    def update_table(filter):
+        filtering_expressions = filter.split(" && ")
+        dff = tall
+        for filter_part in filtering_expressions:
+            col_name, operator, filter_value = split_filter_part(filter_part)
+            if operator in ("eq", "ne", "lt", "le", "gt", "ge"):
+                # these operators match pandas series operator method names
+                dff = dff.loc[getattr(dff[col_name], operator)(filter_value)]
+            elif operator == "contains":
+                dff = dff.loc[dff[col_name].str.contains(filter_value)]
+            elif operator == "datestartswith":
+                # this is a simplification of the front-end filtering logic,
+                # only works with complete fields in standard format
+                dff = dff.loc[dff[col_name].str.startswith(filter_value)]
+        return dff.to_dict("records")
+
     @app.callback(Output("search", "data"), [Input("search", "filter_query")])
     def update_names(filter):
         id_field = "voter_id"
@@ -114,6 +141,26 @@ if __name__ == "__main__":
         return dff.to_dict("records")
 
     # Update the source data table
+    @app.callback(
+        Output("network", "selectedData"),
+        [Input("description", "filter_query")],
+    )
+    def update_network(filter):
+        filtering_expressions = filter.split(" && ")
+        dff = tall
+        for filter_part in filtering_expressions:
+            col_name, operator, filter_value = split_filter_part(filter_part)
+            if operator in ("eq", "ne", "lt", "le", "gt", "ge"):
+                # these operators match pandas series operator method names
+                dff = dff.loc[getattr(dff[col_name], operator)(filter_value)]
+            elif operator == "contains":
+                dff = dff.loc[dff[col_name].str.contains(filter_value)]
+            elif operator == "datestartswith":
+                # this is a simplification of the front-end filtering logic,
+                # only works with complete fields in standard format
+                dff = dff.loc[dff[col_name].str.startswith(filter_value)]
+        return dff["voter_id_target"].tolist()
+
     @app.callback(
         Output("source", "data"),
         [Input("search", "active_cell"), Input("search", "data")],
@@ -180,7 +227,7 @@ if __name__ == "__main__":
             # Get occurrences of name in the source file
             row_index = selection["row"]
             name = " ".join(data[row_index][x] for x in print_fields)
-            return f"These people contacted {name}..."
+            return f"{name} contacted these people..."
         else:
             return "Source"
 
@@ -202,5 +249,7 @@ if __name__ == "__main__":
             return f"These people contacted {name}..."
         else:
             return "Source"
+
+            return nodes[display].to_dict(orient="records")
 
     app.run_server(host="0.0.0.0", debug=True)
