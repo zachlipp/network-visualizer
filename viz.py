@@ -1,5 +1,6 @@
-from typing import List, Tuple
+from typing import List, Tuple, Iterable
 
+import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 from dash import dash_table, dcc
@@ -37,15 +38,20 @@ def unpack_edges(network: Graph) -> Tuple[List[float]]:
     return transposed
 
 
-def unpack_nodes(network: Graph) -> Tuple[List[float]]:
+def unpack_nodes(network: Graph, matches: Iterable | None = None) -> DataFrame:
+    id_to_position_lookup = network._node.items()
+    if matches is not None:
+        matches = set(matches)
+        filtered = {k: v["position"] for k, v in id_to_position_lookup if k in matches}
+    else:
+        filtered = {k: v["position"] for k, v in id_to_position_lookup}
     positions = []
-    for node in network.nodes():
-        position = network.nodes[node]["position"]
-        positions.append(position)
+    for _id, pos in filtered.items():
+        positions.append([_id, *pos])
 
-    # Transpose the list to get ndim lists of len(network.edges())
-    transposed = pd.DataFrame(positions).T.values
-    return transposed
+    # TODO: Generalize for 2d?
+    df = pd.DataFrame(positions, columns=["voter_id", "x", "y", "z"])
+    return df
 
 
 def graph_edges(x: List, y: List, z: List, ids: List) -> Scatter3d:
@@ -65,9 +71,8 @@ def graph_edges(x: List, y: List, z: List, ids: List) -> Scatter3d:
 
 
 def graph_nodes(
-    x: List, y: List, z: List, node_colors: List, node_text: List, ids: List
+    x: np.array, y: List, z: List, node_colors: List, node_text: List, ids: List
 ) -> Scatter3d:
-    # TODO: Generalize
     node_trace = go.Scatter3d(
         x=x,
         y=y,
@@ -156,31 +161,7 @@ operators = [
 ]
 
 
-def split_filter_part(filter_part):
-    for operator_type in operators:
-        for operator in operator_type:
-            if operator in filter_part:
-                name_part, value_part = filter_part.split(operator, 1)
-                name = name_part[name_part.find("{") + 1 : name_part.rfind("}")]
-
-                value_part = value_part.strip()
-                v0 = value_part[0]
-                if v0 == value_part[-1] and v0 in ("'", '"', "`"):
-                    value = value_part[1:-1].replace("\\" + v0, v0)
-                else:
-                    try:
-                        value = float(value_part)
-                    except ValueError:
-                        value = value_part
-
-                # word operators need spaces after them in the filter string,
-                # but we don't want these later
-                return name, operator_type[0].strip(), value
-
-    return [None] * 3
-
-
-def display_network(edge_trace: List, node_trace: List) -> dcc.Graph:
+def display_network(edge_trace: List, node_trace: go.Scatter3d) -> dcc.Graph:
     return dcc.Graph(
         id="network",
         figure=go.Figure(

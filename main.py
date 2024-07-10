@@ -26,7 +26,7 @@ COLUMNS = [
 ]
 
 if __name__ == "__main__":
-    nodes, edges, network = mock_data()
+    nodes, edges, network = mock_data(n_nodes=10, n_edges=20)
     tall = edges.merge(nodes, left_on="source", right_on="voter_id", how="left")
     tall = tall.merge(
         nodes,
@@ -40,8 +40,11 @@ if __name__ == "__main__":
     nodes["color"] = nodes["gender"].map({"M": "blue", "F": "red", "O": "grey"})
     full_edge_trace = graph_edges(*unpack_edges(network), ids=nodes["voter_id"])
     text = nodes["first_name"] + " " + nodes["last_name"]
+    node_positions = unpack_nodes(network)
     full_node_trace = graph_nodes(
-        *unpack_nodes(network),
+        x=node_positions["x"],
+        y=node_positions["y"],
+        z=node_positions["z"],
         node_colors=nodes["color"],
         node_text=text,
         ids=nodes["voter_id"],
@@ -53,7 +56,7 @@ if __name__ == "__main__":
             html.Div(
                 [display_network(full_edge_trace, full_node_trace)],
                 className="graph-container",
-                id="graph-viz"
+                id="graph-viz",
             ),
             html.Div(
                 [
@@ -76,18 +79,14 @@ if __name__ == "__main__":
             html.Div(
                 [
                     html.H3("Source", id="source-title"),
-                    display_table(
-                        df=nodes[COLUMNS], columns=COLUMNS, html_id="source"
-                    ),
+                    display_table(df=nodes[COLUMNS], columns=COLUMNS, html_id="source"),
                 ],
                 className="table-wide",
             ),
             html.Div(
                 [
                     html.H3("Target", id="target-title"),
-                    display_table(
-                        df=nodes[COLUMNS], columns=COLUMNS, html_id="target"
-                    ),
+                    display_table(df=nodes[COLUMNS], columns=COLUMNS, html_id="target"),
                 ],
                 className="table-wide",
             ),
@@ -138,7 +137,7 @@ if __name__ == "__main__":
         Output("network", "selectedData"),
         [Input("description", "filter_query")],
     )
-    def update_network(filter):
+    def update_source_table(filter):
         filtering_expressions = filter.split(" && ")
         dff = tall
         for filter_part in filtering_expressions:
@@ -218,17 +217,26 @@ if __name__ == "__main__":
                 filter_edge=lambda source, target: source == person_id
                 or target == person_id,
             )
-            # Subgraphs with filter_edge includes all nodes.
-            # Subgraphs with filter_node do not include all edges.
-            # Least gross way to do this
             filtered_edges = pd.DataFrame(subgraph.edges, columns=["source", "target"])
-            filtered_nodes = nodes[nodes.voter_id.isin(filtered_edges.source) | nodes.voter_id.isin(filtered_edges.target)]
-            # TODO: Filter nodes
-            edge_trace = graph_edges(*unpack_edges(subgraph), ids=filtered_nodes["voter_id"])
+            selected_ids = set(
+                filtered_edges.source.tolist() + filtered_edges.target.tolist()
+            )
+
+            filtered_nodes = nodes[nodes.voter_id.isin(selected_ids)].reset_index(
+                drop=True
+            )
+            edge_trace = graph_edges(
+                *unpack_edges(subgraph), ids=filtered_nodes["voter_id"]
+            )
+            positions = unpack_nodes(subgraph, filtered_nodes.voter_id.unique())
             node_trace = graph_nodes(
-                *unpack_nodes(subgraph),
+                x=positions["x"],
+                y=positions["y"],
+                z=positions["z"],
                 node_colors=filtered_nodes["color"],
-                node_text=text,
+                node_text=filtered_nodes["first_name"]
+                + " "
+                + filtered_nodes["last_name"],
                 ids=filtered_nodes["voter_id"],
             )
 
@@ -273,7 +281,5 @@ if __name__ == "__main__":
             return f"These people contacted {name}..."
         else:
             return "Source"
-
-            return nodes[display].to_dict(orient="records")
 
     app.run_server(host="0.0.0.0", debug=True)
