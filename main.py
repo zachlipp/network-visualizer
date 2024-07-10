@@ -36,8 +36,15 @@ if __name__ == "__main__":
         how="left",
     )
 
-    # M = Male / F = Female
-    nodes["color"] = nodes["gender"].map({"M": "blue", "F": "red", "O": "grey"})
+    nodes["color"] = nodes["support"].map(
+        {
+            "5 - Oppose": "#db231d",
+            "4 - Lean Oppose": "#e97b77",
+            "3 - Undecided": "#b094b0",
+            "2 - Lean Support": "#77ace9",
+            "1 - Support": "#1d76db",
+        }
+    )
     full_edge_trace = graph_edges(*unpack_edges(network), ids=nodes["voter_id"])
     text = nodes["first_name"] + " " + nodes["last_name"]
     node_positions = unpack_nodes(network)
