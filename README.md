@@ -16,7 +16,10 @@ Users can filter records with searches, eventually visualzing all connections fo
 This is a very table-heavy application. The idea is that this replaces some querying and maybe even coding for a technically-minded user.
 
 ### 🤯 **3 entire dimensions (oooOoOo!)**
+<details>
+<summary>See it yourself!</summary>
 ![](https://github.com/zachlipp/network-visualizer/blob/figs/figs/rotate.gif)
+</details>
 Is it necessary? No. Is it cool? Yes. 📊 😎
 
 ## ⚡ Quick Start
