@@ -1,4 +1,3 @@
-version: "3"
 services:
   network-viz:
     container_name: network-viz
@@ -7,3 +6,7 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8050:8050"
+    # While the Dockerfile COPYs our files to home on build,
+    # this let's us live-reload without rebuilds while running the debug server
+    volumes:
+      - .:/home

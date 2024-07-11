@@ -1,4 +1,9 @@
-.header {
+@import url(https://fonts.googleapis.com/css?family=Lato:700);
+body {
+  font-family: Lato;
+}
+
+h1 {
   margin-left: 20px;
   margin-right: 20px;
 }

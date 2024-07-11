@@ -1,17 +1,17 @@
-from typing import Dict, List, Tuple
+from typing import List, Tuple, Iterable
 
-import dash_core_components as dcc
-import dash_table
+import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
+from dash import dash_table, dcc
 from networkx.classes.graph import Graph
 from pandas.core.frame import DataFrame
-from plotly.graph_objs import Scatter, Scatter3d
+from plotly.graph_objs import Scatter3d
 
 
 def unpack_edges(network: Graph) -> Tuple[List[float]]:
     """Manipulates the wonky network data into wonky lists
-    
+
     Lists will be as follows:
     [point 1 x0, point 1 x1, np.nan, point 2 x0, point 2 x2, np.nan]
 
@@ -25,8 +25,8 @@ def unpack_edges(network: Graph) -> Tuple[List[float]]:
         target = edge[1]
 
         # "position" is an array with one element per network dimension
-        source_coords = network.node[source]["position"]
-        target_coords = network.node[target]["position"]
+        source_coords = network.nodes[source]["position"]
+        target_coords = network.nodes[target]["position"]
         padding = [None for _ in source_coords]
 
         positions.append(source_coords)
@@ -38,15 +38,20 @@ def unpack_edges(network: Graph) -> Tuple[List[float]]:
     return transposed
 
 
-def unpack_nodes(network: Graph) -> Tuple[List[float]]:
+def unpack_nodes(network: Graph, matches: Iterable | None = None) -> DataFrame:
+    id_to_position_lookup = network._node.items()
+    if matches is not None:
+        matches = set(matches)
+        filtered = {k: v["position"] for k, v in id_to_position_lookup if k in matches}
+    else:
+        filtered = {k: v["position"] for k, v in id_to_position_lookup}
     positions = []
-    for node in network.nodes():
-        position = network.node[node]["position"]
-        positions.append(position)
+    for _id, pos in filtered.items():
+        positions.append([_id, *pos])
 
-    # Transpose the list to get ndim lists of len(network.edges())
-    transposed = pd.DataFrame(positions).T.values
-    return transposed
+    # TODO: Generalize for 2d?
+    df = pd.DataFrame(positions, columns=["voter_id", "x", "y", "z"])
+    return df
 
 
 def graph_edges(x: List, y: List, z: List, ids: List) -> Scatter3d:
@@ -66,9 +71,8 @@ def graph_edges(x: List, y: List, z: List, ids: List) -> Scatter3d:
 
 
 def graph_nodes(
-    x: List, y: List, z: List, node_colors: List, node_text: List, ids: List
+    x: np.array, y: List, z: List, node_colors: List, node_text: List, ids: List
 ) -> Scatter3d:
-    # TODO: Generalize
     node_trace = go.Scatter3d(
         x=x,
         y=y,
@@ -126,9 +130,7 @@ def split_filter_part(filter_part):
         for operator in operator_type:
             if operator in filter_part:
                 name_part, value_part = filter_part.split(operator, 1)
-                name = name_part[
-                    name_part.find("{") + 1 : name_part.rfind("}")
-                ]
+                name = name_part[name_part.find("{") + 1 : name_part.rfind("}")]
 
                 value_part = value_part.strip()
                 v0 = value_part[0]
@@ -147,15 +149,35 @@ def split_filter_part(filter_part):
     return [None] * 3
 
 
-def display_network(edge_trace: List, node_trace: List) -> dcc.Graph:
+operators = [
+    ["ge ", ">="],
+    ["le ", "<="],
+    ["lt ", "<"],
+    ["gt ", ">"],
+    ["ne ", "!="],
+    ["eq ", "="],
+    ["contains "],
+    ["datestartswith "],
+]
+
+
+def display_network(
+    edge_trace: List, node_trace: go.Scatter3d, filtered: bool = False
+) -> dcc.Graph:
+    if not filtered:
+        eye = {"x": 0.7, "y": 0.7, "z": 0.7}
+    else:
+        eye = {"x": 1, "y": 1, "z": 1}
     return dcc.Graph(
         id="network",
         figure=go.Figure(
             data=[edge_trace, node_trace],
             layout=go.Layout(
+                showlegend=False,
                 hovermode="closest",
                 margin=dict(b=20, l=5, r=5, t=40),
                 scene=dict(
+                    camera=dict(center=dict(x=0, y=0, z=0), eye=eye),
                     xaxis=dict(
                         color="rgba(0,0,0,0)",
                         showbackground=False,
