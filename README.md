@@ -1,7 +1,7 @@
 <h1 align="center">Voter Network Visualizer Demo</h1>
 <h3 align="center">Provided to the Sanders 2020 primary campaign</h3>
 
-g1: overall
+![](https://github.com/zachlipp/network-visualizer/blob/figs/figs/overview.gif)
 
 ## 📝 Overview
 The voter network visualizer helps
@@ -9,15 +9,15 @@ The goal of this project was to provide a way to display and work with relationa
 
 ## 💥 Features
 ### 🔍 **Searching and filtering**
-g2: isolate
+![](https://github.com/zachlipp/network-visualizer/blob/figs/figs/search.gif)
 Users can filter records with searches, eventually visualzing all connections for one person by clicking on thier record. This lets an organizer see the individual's network before contacting them.
 
 ### 🗒️ **Your data, front-and-center**
-png1: table
+![](https://github.com/zachlipp/network-visualizer/blob/figs/figs/tables.png)
 This is a very table-heavy application. The idea is that this replaces some querying and maybe even coding for a technically-minded user.
 
 ### 🤯 **3 entire dimensions (oooOoOo!)**
-g4: rotate
+![](https://github.com/zachlipp/network-visualizer/blob/figs/figs/rotate.gif)
 Is it necessary? No. Is it cool? Yes. 📊 😎
 
 ## ⚡ Quick Start
@@ -31,7 +31,7 @@ Is it necessary? No. Is it cool? Yes. 📊 😎
 <h3>❤️❤️❤️🖤🖤 (3/5)</h3>
 <h3>Reflection</h3>
 
-<p>This is the coolest project I have ever gotten to work on. We built the car as we drove. The app is fun and performed specifications.</p> 
+<p>This is the coolest project I have ever gotten to work on. We built the car as we drove. The app is fun and performed specifications.</p>
 
 <p>That said, I've learned a lot since I built this. Even though this project rocks, this isn't exactly the quality of code I'd submit for a job interview. Consider this a useful prototype provided on a tight timeline - after all, that's what it is.</p>
 
