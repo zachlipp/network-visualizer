@@ -4,8 +4,7 @@
 ![](https://github.com/zachlipp/network-visualizer/blob/figs/figs/overview.gif)
 
 ## 📝 Overview
-The voter network visualizer helps
-The goal of this project was to provide a way to display and work with relational data for political campaigns' field organizers. This is a slightly refreshed and **entirely** anonymized version of the code provided to the Sanders campaign.
+The goal of this project was to provide a way to display and work with relational data for political campaigns' field organizers. This is a slightly refreshed and **entirely** anonymized version of the code provided to the Sanders primary campaign in 2020. It's a fun example of building a data-intensive, interactive application without having to write bespoke JavaScript.
 
 ## 💥 Features
 ### 🔍 **Searching and filtering**
