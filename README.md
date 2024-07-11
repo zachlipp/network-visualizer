@@ -18,7 +18,7 @@ This is a very table-heavy application. The idea is that this replaces some quer
 ### 🤯 **3 entire dimensions (oooOoOo!)**
 <details>
 <summary>See it yourself!</summary>
-![](https://github.com/zachlipp/network-visualizer/blob/figs/figs/rotate.gif)
+<img src="https://github.com/zachlipp/network-visualizer/blob/figs/figs/rotate.gif" />
 </details>
 Is it necessary? No. Is it cool? Yes. 📊 😎
 
