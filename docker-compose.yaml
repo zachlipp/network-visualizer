@@ -7,6 +7,6 @@ services:
     ports:
       - "8050:8050"
     # While the Dockerfile COPYs our files to home on build,
-    # this let's us live-reload without rebuilds while debugging
+    # this let's us live-reload without rebuilds while running the debug server
     volumes:
       - .:/home
