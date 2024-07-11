@@ -8,13 +8,9 @@ The voter network visualizer helps
 The goal of this project was to provide a way to display and work with relational data for political campaigns' field organizers. This is a slightly refreshed and **entirely** anonymized version of the code provided to the Sanders campaign.
 
 ## 💥 Features
-### 💻 **Basic search**
-g2: search
-Users can find groups of people matching their critera by searching fields directly.
-
-### 🔍 **Isolate individuals**
-g3: isolate
-Users can filter records to one person with one click. This lets an organizer see the individual's network before contacting them.
+### 🔍 **Searching and filtering**
+g2: isolate
+Users can filter records with searches, eventually visualzing all connections for one person by clicking on thier record. This lets an organizer see the individual's network before contacting them.
 
 ### 🗒️ **Your data, front-and-center**
 png1: table
