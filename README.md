@@ -39,7 +39,7 @@ Is it necessary? No. Is it cool? Yes. 📊 😎
 <h3>❤️❤️❤️🖤🖤 (3/5)</h3>
 <h3>Reflection</h3>
 
-<p>This is the coolest project I have ever gotten to work on. We built the car as we drove. The app is fun and performed specifications.</p>
+<p>This is the coolest project I have ever gotten to work on. We built the car as we drove and tried to provide a useful tool to people who needed it. The app is fun and performed to specifications.</p>
 
 <p>That said, I've learned a lot since I built this. Even though this project rocks, this isn't exactly the quality of code I'd submit for a job interview. Consider this a useful prototype provided on a tight timeline - after all, that's what it is.</p>
 
