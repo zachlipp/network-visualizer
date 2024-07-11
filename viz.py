@@ -161,7 +161,13 @@ operators = [
 ]
 
 
-def display_network(edge_trace: List, node_trace: go.Scatter3d) -> dcc.Graph:
+def display_network(
+    edge_trace: List, node_trace: go.Scatter3d, filtered: bool = False
+) -> dcc.Graph:
+    if not filtered:
+        eye = {"x": 0.7, "y": 0.7, "z": 0.7}
+    else:
+        eye = {"x": 1, "y": 1, "z": 1}
     return dcc.Graph(
         id="network",
         figure=go.Figure(
@@ -171,9 +177,7 @@ def display_network(edge_trace: List, node_trace: go.Scatter3d) -> dcc.Graph:
                 hovermode="closest",
                 margin=dict(b=20, l=5, r=5, t=40),
                 scene=dict(
-                    camera=dict(
-                        center=dict(x=0, y=0, z=0), eye=dict(x=0.7, y=0.7, z=0.7)
-                    ),
+                    camera=dict(center=dict(x=0, y=0, z=0), eye=eye),
                     xaxis=dict(
                         color="rgba(0,0,0,0)",
                         showbackground=False,

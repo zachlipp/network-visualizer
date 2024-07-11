@@ -247,9 +247,9 @@ if __name__ == "__main__":
                 ids=filtered_nodes["voter_id"],
             )
 
-            return display_network(edge_trace, node_trace)
+            return display_network(edge_trace, node_trace, filtered=True)
         else:
-            return display_network(full_edge_trace, full_node_trace)
+            return display_network(full_edge_trace, full_node_trace, filtered=False)
 
     # Update the target header
     @app.callback(
