@@ -8,11 +8,17 @@ The goal of this project was to provide a way to display and work with relationa
 
 ## 💥 Features
 ### 🔍 **Searching and filtering**
-![](https://github.com/zachlipp/network-visualizer/blob/figs/figs/search.gif)
+<details>
+<summary>See it yourself!</summary>
+<img src="https://github.com/zachlipp/network-visualizer/blob/figs/figs/search.gif" />
+</details>
 Users can filter records with searches, eventually visualzing all connections for one person by clicking on thier record. This lets an organizer see the individual's network before contacting them.
 
 ### 🗒️ **Your data, front-and-center**
-![](https://github.com/zachlipp/network-visualizer/blob/figs/figs/tables.png)
+<details>
+<summary>See it yourself!</summary>
+<img src="https://github.com/zachlipp/network-visualizer/blob/figs/figs/tables.png" />
+</details>
 This is a very table-heavy application. The idea is that this replaces some querying and maybe even coding for a technically-minded user.
 
 ### 🤯 **3 entire dimensions (oooOoOo!)**
