@@ -26,7 +26,7 @@ COLUMNS = [
 ]
 
 if __name__ == "__main__":
-    nodes, edges, network = mock_data(n_nodes=10, n_edges=20)
+    nodes, edges, network = mock_data()
     tall = edges.merge(nodes, left_on="source", right_on="voter_id", how="left")
     tall = tall.merge(
         nodes,

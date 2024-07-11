@@ -167,6 +167,7 @@ def display_network(edge_trace: List, node_trace: go.Scatter3d) -> dcc.Graph:
         figure=go.Figure(
             data=[edge_trace, node_trace],
             layout=go.Layout(
+                showlegend=False,
                 hovermode="closest",
                 margin=dict(b=20, l=5, r=5, t=40),
                 scene=dict(
