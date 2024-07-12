@@ -12,7 +12,7 @@ The goal of this project was to provide a way to display and work with relationa
 <summary>See it yourself!</summary>
 <img src="https://github.com/zachlipp/network-visualizer/blob/figs/figs/search.gif" />
 </details>
-Users can filter records with searches, eventually visualzing all connections for one person by clicking on thier record. This lets an organizer see the individual's network before contacting them.
+Users can filter records with searches, eventually visualizing all connections for one person by clicking on thier record. This lets an organizer see the individual's network before contacting them.
 
 ### 🗒️ **Your data, front-and-center**
 <details>
