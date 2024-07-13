@@ -1,4 +1,4 @@
-<h1 align="center">Voter Network Visualizer Demo</h1>
+<h1 align="center">Voter Social Network Visualizer Demo</h1>
 <h3 align="center">Provided to the Sanders 2020 primary campaign</h3>
 
 ![](https://github.com/zachlipp/network-visualizer/blob/figs/figs/overview.gif)
